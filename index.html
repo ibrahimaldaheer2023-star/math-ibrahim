@@ -74,10 +74,27 @@
     .btn-dark { background: #1e293b; color: #fff; border: none; padding: 12px; width: 100%; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
     .demo-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 12px; margin-top: 12px; }
-    .preview-img { width: 100%; max-height: 300px; object-fit: contain; border-radius: 12px; border: 1px solid #cbd5e1; background: #0f172a; margin-top: 12px; }
+    .preview-img { width: 100%; max-height: 320px; object-fit: contain; border-radius: 12px; border: 1px solid #cbd5e1; background: #0f172a; margin-top: 12px; }
     .result-banner { background: #0f172a; color: #fff; padding: 14px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .ex-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; font-size: 12px; }
     .ex-head { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 4px; }
+    .custom-rubric-box {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f8fafc;
+      border: 1px dashed #94a3b8;
+      border-radius: 10px;
+    }
+    .custom-textarea {
+      width: 100%;
+      min-height: 65px;
+      margin-top: 6px;
+      padding: 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 12px;
+    }
     table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
     th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: right; }
     th { background: #f1f5f9; font-weight: 800; }
@@ -102,14 +119,14 @@
     <div class="header-top">
       <div>
         <h1>المصحح الذكي لخط اليد والبراهين (300 درجة) - المنهاج السوري</h1>
-        <div class="subtitle">يدعم OpenAI Compatible Endpoints ويعمل مباشرة على الآيفون (السابع - الثامن - العاشر)</div>
+        <div class="subtitle">يدعم OpenAI Compatible Endpoints مع ضغط تلقائي لصور الآيفون وقراءة دقيقة للسلم</div>
       </div>
       <span id="headerScoreBadge" class="badge-score">300 / 300</span>
     </div>
 
     <div class="endpoint-box">
       <input id="baseUrlInput" type="text" class="api-input" value="https://api.openai.com/v1" placeholder="رابط الخادم (Base URL) مثل https://api.openai.com/v1" onchange="saveConfig()" />
-      <input id="apiKeyInput" type="text" class="api-input" placeholder="مفتاح OpenAI Compatible API Key (اختياري)" onchange="saveConfig()" />
+      <input id="apiKeyInput" type="text" class="api-input" placeholder="مفتاح OpenAI Compatible API Key" onchange="saveConfig()" />
       <input id="modelNameInput" type="text" class="api-input" value="gpt-4o-mini" placeholder="اسم النموذج (Model) مثل gpt-4o-mini" onchange="saveConfig()" />
     </div>
 
@@ -124,22 +141,28 @@
 
 <div class="container">
   <div class="card grade-bar no-print">
-    <span style="font-size:12px; font-weight:800;">اختر قالب المنهاج السوري الجاهز (من 300 درجة):</span>
+    <span style="font-size:12px; font-weight:800;">اختر وضع التصحيح أو القالب الجاهز (من 300 درجة):</span>
     <div class="grade-btns">
       <button id="btn-g7" class="btn" onclick="selectGrade('grade7')">الصف السابع (300)</button>
       <button id="btn-g8" class="btn active-grade" onclick="selectGrade('grade8')">الصف الثامن (300)</button>
       <button id="btn-g10" class="btn" onclick="selectGrade('grade10')">الصف العاشر (300)</button>
+      <button id="btn-free" class="btn" onclick="selectGrade('free')">📋 تصحيح حر لأي ورقة خارجية</button>
     </div>
   </div>
 
   <div id="tab-scanner">
     <div class="card">
-      <h3 style="font-size:14px; font-weight:800;">التقاط صورة الورقة بكاميرا الآيفون أو التجربة الفورية</h3>
+      <h3 style="font-size:14px; font-weight:800;">التقاط صورة الورقة بكاميرا الآيفون أو رفعها من الاستوديو</h3>
       <div class="grid-2">
         <input id="cameraInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="handleFile(event)" />
         <button class="btn-green" onclick="document.getElementById('cameraInput').click()">📷 فتح كاميرا الآيفون</button>
         <input id="fileInput" type="file" accept="image/*" style="display:none" onchange="handleFile(event)" />
         <button class="btn-dark" onclick="document.getElementById('fileInput').click()">📁 رفع صورة من الجهاز</button>
+      </div>
+
+      <div class="custom-rubric-box">
+        <label style="font-size:12px; font-weight:800; color:#1e293b;">إضافة ملاحظات أو سلم تصحيح مخصص لهذه الورقة (اختياري):</label>
+        <textarea id="customNotesInput" class="custom-textarea" placeholder="اتركه فارغاً لاستخدام السلم المعتمد، أو اكتب هنا توزيع الدرجات أو الإجابات النموذجية إذا كانت الورقة المصورة تحتوي على أسئلة خارجية خاصة بك..."></textarea>
       </div>
 
       <div class="demo-box">
@@ -152,13 +175,13 @@
 
       <div id="imagePreviewBox" style="display:none;">
         <img id="previewImg" class="preview-img" alt="ورقة الطالب" />
-        <button id="gradeBtn" class="btn-green" style="margin-top:10px;" onclick="gradeCurrentImage()">بدء قراءة خط اليد والتصحيح عبر OpenAI Endpoint (من 300)</button>
+        <button id="gradeBtn" class="btn-green" style="margin-top:10px;" onclick="gradeCurrentImage()">🔍 بدء قراءة خط اليد والتصحيح الفعلي عبر OpenAI Endpoint (من 300)</button>
       </div>
     </div>
 
     <div class="card" id="resultCard">
       <div style="text-align:center; color:#64748b; font-size:12px; padding:24px 0;">
-        اضغط على زر "ورقة طالب متفوق" أو صوّر ورقة بكاميرا الآيفون لعرض التقرير المفصل من 300 درجة.
+        صوّر ورقة الطالب بكاميرا الآيفون ثم اضغط على زر "بدء قراءة خط اليد" لعرض التقرير الفعلي المفصل من 300 درجة.
       </div>
     </div>
   </div>
@@ -210,10 +233,10 @@ const PRESETS = {
     schoolName: 'مديرية التربية - مدرسة المتفوقين',
     title: 'مذاكرة الرياضيات الشاملة (جبر وهندسة) - الفصل الأول',
     mcq: [
-      { id: 1, q: 'قيمة العبارة الجبرية (-12) + (+20) تساوي:', ans: 'ب', pts: 15, opts: 'أ) -8 | ب) +8 | ج) -32 | د) +32' },
-      { id: 2, q: 'المضاعف المشترك الأصغر للعددين 8 و 12 هو:', ans: 'ج', pts: 15, opts: 'أ) 4 | ب) 96 | ج) 24 | د) 16' },
-      { id: 3, q: 'في مثلث متساوي الساقين زاوية رأسه 80°، زاوية القاعدة:', ans: 'أ', pts: 15, opts: 'أ) 50° | ب) 80° | ج) 100° | د) 40°' },
-      { id: 4, q: 'العدد الأولي من بين الأعداد الآتية هو:', ans: 'د', pts: 15, opts: 'أ) 27 | ب) 35 | ج) 51 | د) 29' }
+      { id: 1, q: 'قيمة العبارة الجبرية (-12) + (+20) تساوي:', ans: 'ب (+8)', pts: 15, opts: 'أ) -8 | ب) +8 | ج) -32 | د) +32' },
+      { id: 2, q: 'المضاعف المشترك الأصغر للعددين 8 و 12 هو:', ans: 'ج (24)', pts: 15, opts: 'أ) 4 | ب) 96 | ج) 24 | د) 16' },
+      { id: 3, q: 'في مثلث متساوي الساقين زاوية رأسه 80°، زاوية القاعدة:', ans: 'أ (50°)', pts: 15, opts: 'أ) 50° | ب) 80° | ج) 100° | د) 40°' },
+      { id: 4, q: 'العدد الأولي من بين الأعداد الآتية هو:', ans: 'د (29)', pts: 15, opts: 'أ) 27 | ب) 35 | ج) 51 | د) 29' }
     ],
     blanks: [
       { id: 1, q: 'معكوس العدد الصحيح (-25) بالنسبة للجمع هو:', ans: '+25', pts: 15 },
@@ -233,10 +256,10 @@ const PRESETS = {
     schoolName: 'مديرية التربية - ثانوية الباسل للمتفوقين',
     title: 'مذاكرة الرياضيات (الجبر والهندسة البرهانية) - الصف الثامن',
     mcq: [
-      { id: 1, q: 'ميل المستقيم الذي معادلته y = 4x - 7 يساوي:', ans: 'أ', pts: 15, opts: 'أ) 4 | ب) -7 | ج) -4 | د) 7/4' },
-      { id: 2, q: 'نشر المطابقة التربيعية (2x - 3)^2 هو:', ans: 'د', pts: 15, opts: 'أ) 4x^2-9 | ب) 2x^2-6x+9 | ج) 4x^2+12x+9 | د) 4x^2-12x+9' },
-      { id: 3, q: 'طول المتوسط المتعلق بالوتر في مثلث قائم وتره 14 cm:', ans: 'ج', pts: 15, opts: 'أ) 28 cm | ب) 14 cm | ج) 7 cm | د) 3.5 cm' },
-      { id: 4, q: 'الجذر التربيعي للعدد الموجب √(0.49) يساوي:', ans: 'ب', pts: 15, opts: 'أ) 0.07 | ب) 0.7 | ج) 7 | د) 0.24' }
+      { id: 1, q: 'ميل المستقيم الذي معادلته y = 4x - 7 يساوي:', ans: 'أ (4)', pts: 15, opts: 'أ) 4 | ب) -7 | ج) -4 | د) 7/4' },
+      { id: 2, q: 'نشر المطابقة التربيعية (2x - 3)^2 هو:', ans: 'د (4x^2-12x+9)', pts: 15, opts: 'أ) 4x^2-9 | ب) 2x^2-6x+9 | ج) 4x^2+12x+9 | د) 4x^2-12x+9' },
+      { id: 3, q: 'طول المتوسط المتعلق بالوتر في مثلث قائم وتره 14 cm:', ans: 'ج (7 cm)', pts: 15, opts: 'أ) 28 cm | ب) 14 cm | ج) 7 cm | د) 3.5 cm' },
+      { id: 4, q: 'الجذر التربيعي للعدد الموجب √(0.49) يساوي:', ans: 'ب (0.7)', pts: 15, opts: 'أ) 0.07 | ب) 0.7 | ج) 7 | د) 0.24' }
     ],
     blanks: [
       { id: 1, q: 'تحليل العبارة (x^2 - 25) إلى جداء عاملين:', ans: '(x - 5)(x + 5)', pts: 15 },
@@ -256,10 +279,10 @@ const PRESETS = {
     schoolName: 'مديرية التربية - ثانوية المأمون الرسمية',
     title: 'الامتحان النصفي في الرياضيات (الجبر والهندسة الشعاعية)',
     mcq: [
-      { id: 1, q: 'مجموعة تعريف التابع f(x) = √(2x - 6) هي:', ans: 'ب', pts: 15, opts: 'أ) R | ب) [3, +∞[ | ج) ]-∞, 3] | د) R\\{3}' },
-      { id: 2, q: 'المميز دلتا (Δ) للمعادلة x^2 - 6x + 5 = 0 يساوي:', ans: 'أ', pts: 15, opts: 'أ) 16 | ب) 36 | ج) -4 | د) 56' },
-      { id: 3, q: 'إذا كانت x حادة وكان sin(x) = 3/5 فإن cos(x) يساوي:', ans: 'ج', pts: 15, opts: 'أ) 2/5 | ب) 5/4 | ج) 4/5 | د) 3/4' },
-      { id: 4, q: 'الشعاعان u(2, -3) و v(-4, 6) يحققان:', ans: 'د', pts: 15, opts: 'أ) متعامدان | ب) غير مرتبطين | ج) u=2v | د) v=-2u مرتبطان خطياً' }
+      { id: 1, q: 'مجموعة تعريف التابع f(x) = √(2x - 6) هي:', ans: 'ب ([3, +∞[)', pts: 15, opts: 'أ) R | ب) [3, +∞[ | ج) ]-∞, 3] | د) R\\{3}' },
+      { id: 2, q: 'المميز دلتا (Δ) للمعادلة x^2 - 6x + 5 = 0 يساوي:', ans: 'أ (16)', pts: 15, opts: 'أ) 16 | ب) 36 | ج) -4 | د) 56' },
+      { id: 3, q: 'إذا كانت x حادة وكان sin(x) = 3/5 فإن cos(x) يساوي:', ans: 'ج (4/5)', pts: 15, opts: 'أ) 2/5 | ب) 5/4 | ج) 4/5 | د) 3/4' },
+      { id: 4, q: 'الشعاعان u(2, -3) و v(-4, 6) يحققان:', ans: 'د (v=-2u مرتبطان خطياً)', pts: 15, opts: 'أ) متعامدان | ب) غير مرتبطين | ج) u=2v | د) v=-2u مرتبطان خطياً' }
     ],
     blanks: [
       { id: 1, q: 'في المعادلة x^2 - 8x + 15 = 0 المجموع S والجداء P هما:', ans: 'S = 8 , P = 15', pts: 15 },
@@ -272,6 +295,18 @@ const PRESETS = {
       { id: 2, title: 'التمرين الثاني (برهان شعاعي وعلاقة شال)', prompt: 'M منتصف BC و G مركز ثقل ABC. برهن شعاعياً أن AB + AC = 2AM', steps: 'حسب شال AB=AM+MB و AC=AM+MC بالجمع نجد 2AM لأن MB+MC=0', finalAns: 'برهان شعاعي كامل لعلاقة شال', pts: 45 },
       { id: 3, title: 'التمرين الثالث (الهندسة التحليلية في المستوي)', prompt: 'A(1,2), B(5,4), C(3,8). أوجد مركبات الأشعة وبرهن أن المثلث قائم ومتساوي الساقين', steps: 'AB(4,2) و BC(-2,4) متساويان بالطول √20 ومجموع مربعيهما 40 = AC^2 فقائم في B', finalAns: 'قائم في B ومتساوي الساقين', pts: 45 },
       { id: 4, title: 'التمرين الرابع (دراسة التوابع الكسرية)', prompt: 'للتابع f(x)=(3x-2)/(x-1) أوجد Df واحسب f(0) و f(2)', steps: 'Df = R\\{1} ، وتعويض المباشر يعطي f(0)=2 و f(2)=4', finalAns: 'Df = R\\{1} , f(0)=2 , f(2)=4', pts: 45 }
+    ]
+  },
+  free: {
+    grade: 'تصحيح حر ومباشر من الورقة (300 درجة)',
+    schoolName: 'مديرية التربية - المنهاج السوري',
+    title: 'تصحيح حر لأي ورقة امتحانية مصورة (تقييم رياضي شامل من 300)',
+    mcq: [],
+    blanks: [],
+    exercises: [
+      { id: 1, title: 'القسم الأول / الأسئلة الموضوعية', prompt: 'قراءة الأسئلة وإجابات الطالب من الورقة مباشرة', steps: 'التحقق من صحة الاختيارات أو الفراغات رياضيّاً', finalAns: 'حسب الورقة', pts: 60 },
+      { id: 2, title: 'القسم الثاني / التمارين الجبرية', prompt: 'فحص خطوات الحل الجبري والمعادلات المكتوبة بخط اليد', steps: 'منح علامات جزئية على كل خطوة صحيحة', finalAns: 'حسب الورقة', pts: 60 },
+      { id: 3, title: 'القسم الثالث / المسائل والبراهين الهندسية', prompt: 'تحليل تسلسل البرهان الهندسي أو الشعاعي والنتائج', steps: 'تقييم دقة المبرهنات والتعويض الحسابي', finalAns: 'حسب الورقة', pts: 180 }
     ]
   }
 };
@@ -286,6 +321,7 @@ let roster = [
 function saveConfig() {
   try {
     localStorage.setItem('oai_base_url', document.getElementById('baseUrlInput').value.trim());
+    localStorage.setItem('oai_api_key', document.getElementById('apiKeyInput').value.trim());
     localStorage.setItem('oai_model_name', document.getElementById('modelNameInput').value.trim());
   } catch (e) {}
 }
@@ -293,8 +329,10 @@ function saveConfig() {
 function loadConfig() {
   try {
     const u = localStorage.getItem('oai_base_url');
+    const k = localStorage.getItem('oai_api_key');
     const m = localStorage.getItem('oai_model_name');
     if (u) document.getElementById('baseUrlInput').value = u;
+    if (k) document.getElementById('apiKeyInput').value = k;
     if (m) document.getElementById('modelNameInput').value = m;
   } catch (e) {}
 }
@@ -303,7 +341,7 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.style.display = 'block';
-  setTimeout(() => { t.style.display = 'none'; }, 3500);
+  setTimeout(() => { t.style.display = 'none'; }, 4000);
 }
 
 function switchTab(tabName, btn) {
@@ -316,12 +354,16 @@ function switchTab(tabName, btn) {
 
 function selectGrade(key) {
   currentKey = key;
-  ['g7', 'g8', 'g10'].forEach(id => document.getElementById('btn-' + id).classList.remove('active-grade'));
+  ['g7', 'g8', 'g10', 'free'].forEach(id => {
+    const el = document.getElementById('btn-' + id);
+    if (el) el.classList.remove('active-grade');
+  });
   if (key === 'grade7') document.getElementById('btn-g7').classList.add('active-grade');
   if (key === 'grade8') document.getElementById('btn-g8').classList.add('active-grade');
   if (key === 'grade10') document.getElementById('btn-g10').classList.add('active-grade');
+  if (key === 'free') document.getElementById('btn-free').classList.add('active-grade');
   renderRubricAndSheet();
-  showToast('تم تفعيل نموذج ' + PRESETS[key].grade + ' (300 درجة)');
+  showToast('تم تفعيل: ' + PRESETS[key].grade);
 }
 
 function renderRubricAndSheet() {
@@ -329,25 +371,27 @@ function renderRubricAndSheet() {
   const rubricHtml = data.exercises.map(ex => `
     <div class="ex-item">
       <div class="ex-head"><span>${ex.title}</span><span style="color:#059669">${ex.pts} درجة</span></div>
-      <div><b>السؤال:</b> ${ex.prompt}</div>
+      <div><b>المطلوب:</b> ${ex.prompt}</div>
       <div style="color:#1e40af"><b>سلم الخطوات:</b> ${ex.steps}</div>
     </div>
   `).join('');
   document.getElementById('rubricDetails').innerHTML = rubricHtml;
 
+  const sheetKey = (currentKey === 'free') ? 'grade8' : currentKey;
+  const sData = PRESETS[sheetKey];
   document.getElementById('printable-sheet').innerHTML = `
     <div style="border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:12px; display:flex; justify-content:space-between; font-size:12px; font-weight:800;">
-      <div>الجمهورية العربية السورية<br>${data.schoolName}<br>${data.grade}</div>
-      <div style="text-align:center; font-size:14px;">${data.title}<br><span style="font-size:11px">ورقة قياسية لتصحيح خط اليد والبراهين</span></div>
+      <div>الجمهورية العربية السورية<br>${sData.schoolName}<br>${sData.grade}</div>
+      <div style="text-align:center; font-size:14px;">${sData.title}<br><span style="font-size:11px">ورقة قياسية لتصحيح خط اليد والبراهين</span></div>
       <div style="border:2px solid #000; padding:6px 12px; border-radius:8px;">الدرجة: ...... / 300</div>
     </div>
     <div style="font-size:12px;">
       <div style="background:#f1f5f9; padding:6px; font-weight:800; border:1px solid #94a3b8;">السؤال الأول: اختر الإجابة الصحيحة (60 درجة)</div>
-      ${data.mcq.map((q, i) => `<div style="padding:6px 0; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between;"><span>${i+1}) ${q.q} [${q.opts}]</span><b>( أ ) ( ب ) ( ج ) ( د )</b></div>`).join('')}
+      ${sData.mcq.map((q, i) => `<div style="padding:6px 0; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between;"><span>${i+1}) ${q.q} [${q.opts}]</span><b>( أ ) ( ب ) ( ج ) ( د )</b></div>`).join('')}
       <div style="background:#f1f5f9; padding:6px; font-weight:800; border:1px solid #94a3b8; margin-top:10px;">السؤال الثاني: املأ الفراغات (60 درجة)</div>
-      ${data.blanks.map((b, i) => `<div style="padding:6px 0; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between;"><span>${i+1}) ${b.q}</span><span style="display:inline-block; width:180px; height:22px; border:1px solid #000;"></span></div>`).join('')}
+      ${sData.blanks.map((b, i) => `<div style="padding:6px 0; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between;"><span>${i+1}) ${b.q}</span><span style="display:inline-block; width:180px; height:22px; border:1px solid #000;"></span></div>`).join('')}
       <div style="background:#f1f5f9; padding:6px; font-weight:800; border:1px solid #94a3b8; margin-top:10px;">السؤال الثالث: حل التمارين والبراهين بالتفصيل (180 درجة)</div>
-      ${data.exercises.map(ex => `<div style="border:1px solid #64748b; padding:8px; margin-top:8px; border-radius:6px;"><b>${ex.title} (${ex.pts} درجة):</b> ${ex.prompt}<div style="height:55px; border-bottom:1px dashed #cbd5e1;"></div></div>`).join('')}
+      ${sData.exercises.map(ex => `<div style="border:1px solid #64748b; padding:8px; margin-top:8px; border-radius:6px;"><b>${ex.title} (${ex.pts} درجة):</b> ${ex.prompt}<div style="height:55px; border-bottom:1px dashed #cbd5e1;"></div></div>`).join('')}
     </div>
   `;
 }
@@ -360,13 +404,31 @@ function handleFile(e) {
     currentImageBase64 = ev.target.result;
     document.getElementById('previewImg').src = currentImageBase64;
     document.getElementById('imagePreviewBox').style.display = 'block';
-    showToast('تم تحميل صورة الورقة بنجاح، اضغط على زر بدء التصحيح');
+    showToast('تم تحميل صورة الورقة بنجاح، اضغط على زر بدء القراءة والتصحيح');
   };
   reader.readAsDataURL(file);
 }
 
+function compressImage(base64Str, maxWidth = 1400) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(1, maxWidth / img.width);
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = () => resolve(base64Str);
+  });
+}
+
 function runDemo(mode) {
-  const data = PRESETS[currentKey];
+  const sheetKey = (currentKey === 'free') ? 'grade8' : currentKey;
+  const data = PRESETS[sheetKey];
   const isPartial = (mode === 'partial');
   const s1 = isPartial ? 45 : 60;
   const s2 = isPartial ? 52 : 60;
@@ -383,37 +445,81 @@ function runDemo(mode) {
   });
   const s3 = exList.reduce((a, b) => a + b.awarded, 0);
   currentResult = {
-    name: isPartial ? 'خالد سامر الدرويش' : 'سارة محمود العلي',
+    name: isPartial ? 'خالد سامر الدرويش (تجريبي)' : 'سارة محمود العلي (تجريبي)',
     cls: data.grade + ' - الشعبة الأولى',
     s1, s2, s3, total: s1 + s2 + s3,
     exList
   };
   renderResult();
-  showToast('تمت قراءة خط اليد وتصحيح الورقة من 300 درجة!');
+  showToast('تم عرض النتيجة التجريبية من 300 درجة');
 }
 
 async function gradeCurrentImage() {
   const baseUrl = document.getElementById('baseUrlInput').value.trim().replace(/\/+$/, '');
   const apiKey = document.getElementById('apiKeyInput').value.trim();
   const modelName = document.getElementById('modelNameInput').value.trim() || 'gpt-4o-mini';
+  const customNotes = document.getElementById('customNotesInput').value.trim();
 
-  if (!apiKey) {
-    showToast('لم يتم إدخال مفتاح API، سيتم تشغيل التصحيح التجريبي الذكي فوراً');
-    runDemo('excellent');
+  if (!currentImageBase64) {
+    alert('يرجى تصوير الورقة أو رفعها أولاً.');
     return;
   }
 
+  if (!apiKey) {
+    alert('تنبيه: لم تقم بإدخال مفتاح API في الخانة العلوية! لقراءة الصورة فعلياً يجب إدخال مفتاح صالح (مثل OpenAI أو OpenRouter).');
+    return;
+  }
+
+  saveConfig();
   const btn = document.getElementById('gradeBtn');
   btn.disabled = true;
-  btn.textContent = '⏳ جاري الاتصال بـ OpenAI Endpoint وتحليل خط اليد...';
-
-  const data = PRESETS[currentKey];
-  const systemPrompt = `أنت مصحح رياضيات خبير في المنهاج السوري (${data.grade}). قم بتحليل صورة ورقة الطالب وتصحيحها من 300 درجة وفق السلم: السؤال الأول 60 درجة، السؤال الثاني 60 درجة، السؤال الثالث 180 درجة مقسمة على 4 تمارين (45 لكل تمرين). أرجع النتيجة بصيغة JSON حصراً بهذا الشكل:
-{"name":"اسم الطالب","cls":"${data.grade}","s1":60,"s2":60,"s3":180,"total":300,"exList":[{"title":"التمرين الأول","steps":"ما كتبه الطالب","awarded":45,"max":45,"note":"ملاحظة التصحيح"}]}`;
-
-  const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : baseUrl + '/chat/completions';
+  btn.textContent = '⏳ جاري ضغط صورة الآيفون وتحليل خط اليد رياضياً...';
 
   try {
+    const compressedImage = await compressImage(currentImageBase64);
+    const data = PRESETS[currentKey];
+
+    let rubricText = '';
+    if (currentKey === 'free') {
+      rubricText = 'وضع التصحيح الحر: اقرأ جميع الأسئلة وإجابات الطالب المكتوبة بخط اليد في الورقة، وصححها رياضيّاً بدقة من مجموع كلي يبلغ 300 درجة موزعة على الأقسام الظاهرة في الورقة (س1 من 60، س2 من 60، س3 من 180).';
+    } else {
+      rubricText = `سلم التصحيح القياسي (${data.grade}):
+- السؤال الأول (اختيار من متعدد - 60 درجة، 15 لكل فقرة):
+${data.mcq.map(m => `${m.id}) ${m.q} -> الجواب الصحيح: ${m.ans}`).join('\n')}
+- السؤال الثاني (فراغات - 60 درجة، 15 لكل فقرة):
+${data.blanks.map(b => `${b.id}) ${b.q} -> الجواب الصحيح: ${b.ans}`).join('\n')}
+- السؤال الثالث (تمارين وبراهين - 180 درجة، 45 لكل تمرين):
+${data.exercises.map(ex => `${ex.title}: ${ex.prompt} | الخطوات: ${ex.steps} | الجواب النهائي: ${ex.finalAns}`).join('\n')}
+ملاحظة هامة: إذا كانت الأسئلة الظاهرة في صورة الورقة تختلف عن هذا القالب، قم بتصحيح الأسئلة الموجودة في الصورة فعلياً واحسب درجتها من 300.`;
+    }
+
+    if (customNotes) {
+      rubricText += `\nتعليمات وسلم خاص من المدرس:\n${customNotes}`;
+    }
+
+    const systemPrompt = `أنت مصحح رياضيات خبير ومدقق في المنهاج السوري. مهمتك قراءة خط يد الطالب باللغة العربية والرموز الرياضية من الصورة المرفقة بدقة عالية، وتصحيح كل خطوة برهانية أو جبرية، ومنح علامات جزئية عادلة على الخطوات الصحيحة حتى لو أخطأ الطالب في النتيجة النهائية.
+${rubricText}
+يجب أن تعيد النتيجة بصيغة JSON حصراً بدون أي شرح خارج JSON، وبالتركيبة التالية تماماً:
+{
+  "name": "اسم الطالب المقروء من الورقة (أو غير محدد إن لم يوجد)",
+  "cls": "${data.grade}",
+  "s1": 0,
+  "s2": 0,
+  "s3": 0,
+  "total": 0,
+  "exList": [
+    {
+      "title": "عنوان السؤال أو التمرين المقروء",
+      "steps": "النص الحرفي لما كتبه الطالب بخط يده في هذا السؤال",
+      "awarded": 0,
+      "max": 45,
+      "note": "التقييم الرياضي التفصيلي وسبب منح أو حسم الدرجات"
+    }
+  ]
+}`;
+
+    const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : baseUrl + '/chat/completions';
+
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
@@ -427,39 +533,47 @@ async function gradeCurrentImage() {
           {
             role: 'user',
             content: [
-              { type: 'text', text: 'اقرأ خط اليد في هذه الورقة وصححها من 300 درجة وأعد JSON فقط.' },
-              { type: 'image_url', image_url: { url: currentImageBase64 } }
+              { type: 'text', text: 'افحص صورة ورقة الطالب المرفقة واقرأ خط اليد بدقة وصححها من 300 درجة وأعد كائن JSON فقط.' },
+              { type: 'image_url', image_url: { url: compressedImage } }
             ]
           }
         ],
-        temperature: 0.2
+        temperature: 0.1
       })
     });
 
     if (!response.ok) {
-      throw new Error('HTTP ' + response.status);
+      const errText = await response.text();
+      throw new Error('HTTP ' + response.status + ' - ' + errText.slice(0, 140));
     }
 
     const resData = await response.json();
     const rawText = resData.choices[0].message.content;
     const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('تنسيق غير صالح');
+    if (!jsonMatch) throw new Error('لم يرجع الخادم بيانات JSON صالحة');
 
-    currentResult = JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(jsonMatch[0]);
+    parsed.s1 = Number(parsed.s1) || 0;
+    parsed.s2 = Number(parsed.s2) || 0;
+    parsed.s3 = Number(parsed.s3) || 0;
+    parsed.total = Number(parsed.total) || (parsed.s1 + parsed.s2 + parsed.s3);
+    if (!Array.isArray(parsed.exList)) parsed.exList = [];
+
+    currentResult = parsed;
     renderResult();
-    showToast('تم التصحيح بنجاح عبر OpenAI Compatible Endpoint!');
+    showToast('✅ تمت قراءة الورقة وتصحيح خط اليد فعلياً!');
   } catch (err) {
-    showToast('تعذر الاتصال بالخادم (' + err.message + ')، تم عرض النتيجة الافتراضية');
-    runDemo('excellent');
+    alert('تعذر إتمام التصحيح الفعلي عبر الخادم:\n' + err.message + '\n\nتأكد من صحة رابط Base URL وصلاحية مفتاح API وأن النموذج المختار يدعم قراءة الصور (Vision).');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'بدء قراءة خط اليد والتصحيح عبر OpenAI Endpoint (من 300)';
+    btn.textContent = '🔍 بدء قراءة خط اليد والتصحيح الفعلي عبر OpenAI Endpoint (من 300)';
   }
 }
 
 function renderResult() {
   if (!currentResult) return;
   const r = currentResult;
+  document.getElementById('headerScoreBadge').textContent = r.total + ' / 300';
   document.getElementById('resultCard').innerHTML = `
     <div class="result-banner">
       <div>
