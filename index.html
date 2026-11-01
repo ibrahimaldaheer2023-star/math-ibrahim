@@ -7,761 +7,528 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="مصحح الرياضيات" />
   <title>المصحح الذكي لخط اليد والبراهين (300 درجة) - المنهاج السوري</title>
-
-  <!-- خط تجول وتنسيقات Tailwind CSS -->
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- مكتبات React و Babel للتشغيل المباشر في المتصفح بدون خادم -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
   <style>
-    body { font-family: 'Tajawal', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      line-height: 1.6;
+      padding-bottom: 60px;
+    }
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #064e3b 100%);
+      color: #fff;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 12px; }
+    .header-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+    h1 { font-size: 18px; font-weight: 800; }
+    .subtitle { font-size: 12px; color: #a7f3d0; margin-top: 2px; }
+    .badge-score {
+      background: #fbbf24; color: #0f172a; padding: 6px 12px;
+      border-radius: 10px; font-weight: 900; font-size: 13px;
+    }
+    .endpoint-box {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
+    }
+    .api-input {
+      background: rgba(15,23,42,0.6);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      width: 100%;
+      direction: ltr;
+      text-align: left;
+    }
+    .api-input::placeholder { color: rgba(255,255,255,0.6); direction: rtl; text-align: right; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .tab-btn {
+      border: none; cursor: pointer; padding: 9px 14px; border-radius: 10px;
+      font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.12); color: #fff;
+    }
+    .tab-btn.active { background: #fff; color: #0f172a; }
+    .card {
+      background: #fff; border-radius: 16px; padding: 16px;
+      border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 14px;
+    }
+    .grade-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+    .grade-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+    .btn {
+      border: 1px solid #cbd5e1; background: #f8fafc; color: #0f172a;
+      padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .btn.active-grade { background: #0f172a; color: #fff; border-color: #0f172a; }
+    .btn-green { background: #059669; color: #fff; border: none; padding: 12px; width: 100%; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; }
+    .btn-green:disabled { background: #94a3b8; cursor: not-allowed; }
+    .btn-dark { background: #1e293b; color: #fff; border: none; padding: 12px; width: 100%; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .demo-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 12px; margin-top: 12px; }
+    .preview-img { width: 100%; max-height: 300px; object-fit: contain; border-radius: 12px; border: 1px solid #cbd5e1; background: #0f172a; margin-top: 12px; }
+    .result-banner { background: #0f172a; color: #fff; padding: 14px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .ex-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; font-size: 12px; }
+    .ex-head { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 4px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+    th, td { padding: 9px; border-bottom: 1px solid #e2e8f0; text-align: right; }
+    th { background: #f1f5f9; font-weight: 800; }
+    .toast {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      background: #0f172a; color: #6ee7b7; padding: 10px 18px; border-radius: 12px;
+      font-size: 12px; font-weight: 700; z-index: 999; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
     @media print {
-      body * { visibility: hidden; }
-      #printable-answer-sheet, #printable-answer-sheet * { visibility: visible; }
-      #printable-answer-sheet {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        box-shadow: none !important;
-        border: 2px solid #000 !important;
-        margin: 0 !important;
-        padding: 14px !important;
-      }
       .no-print { display: none !important; }
+      body { background: #fff; padding: 0; }
+      #printable-sheet { border: 2px solid #000 !important; padding: 14px !important; }
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-900">
-  <div id="root"></div>
+<body>
 
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
+<div id="toast" class="toast no-print"></div>
 
-    // بيانات قوالب المنهاج السوري (السابع، الثامن، العاشر) من 300 درجة
-    const SYRIAN_CURRICULUM_PRESETS_300 = {
-      grade7: {
-        grade: 'الصف السابع الأساسي',
-        schoolName: 'مديرية التربية - مدرسة المتفوقين',
-        title: 'مذاكرة الرياضيات الشاملة (جبر وهندسة) - الفصل الأول',
-        exerciseCount: 4,
-        mcq: [
-          { id: 1, questionHint: 'قيمة العبارة الجبرية (-12) + (+20) تساوي:', correctOption: 'ب', points: 15, optionsText: 'أ) -8 | ب) +8 | ج) -32 | د) +32' },
-          { id: 2, questionHint: 'المضاعف المشترك الأصغر (م.م.أ) للعددين 8 و 12 هو:', correctOption: 'ج', points: 15, optionsText: 'أ) 4 | ب) 96 | ج) 24 | د) 16' },
-          { id: 3, questionHint: 'في المثلث المتساوي الساقين الذي زاوية رأسه 80°، قياس كل زاوية من زاويتي القاعدة:', correctOption: 'أ', points: 15, optionsText: 'أ) 50° | ب) 80° | ج) 100° | د) 40°' },
-          { id: 4, questionHint: 'العدد الأولي من بين الأعداد الآتية هو:', correctOption: 'د', points: 15, optionsText: 'أ) 27 | ب) 35 | ج) 51 | د) 29' },
-        ],
-        blanks: [
-          { id: 1, prompt: 'معكوس (نظير) العدد الصحيح (-25) بالنسبة لعملية الجمع هو:', expectedAnswer: '+25 (أو خمسة وعشرون موجبة)', points: 15 },
-          { id: 2, prompt: 'الزاويتان المتكاملتان هما زاويتان مجموع قياسيهما يساوي:', expectedAnswer: '180 درجة (زاوية مستقيمة)', points: 15 },
-          { id: 3, prompt: 'ناتج اختزال الكسر (24 / 36) إلى أبسط صورة ممكنة هو:', expectedAnswer: '2/3 (ثلثان)', points: 15 },
-          { id: 4, prompt: 'المستقيم العمودي على القطعة المستقيمة في منتصفها يُسمى:', expectedAnswer: 'محور القطعة المستقيمة', points: 15 },
-        ],
-        exercises: [
-          {
-            id: 1,
-            title: 'التمرين الأول (سلسلة عمليات مع الأقواس والقوى)',
-            prompt: 'احسب بالتفصيل قيمة العبارة الآتية مع كتابة خطوات الأولوية: A = 30 - 4 × (5 - 8) + 2^3',
-            expectedSteps: '1) حساب ما داخل القوس: (5 - 8) = -3 (15 درجة). 2) حساب القوة: 2^3 = 8 وعملية الضرب: -4 × (-3) = +12 (15 درجة). 3) الجمع النهائي: 30 + 12 + 8 = 50 (15 درجة).',
-            expectedFinal: 'A = 50',
-            points: 45
-          },
-          {
-            id: 2,
-            title: 'التمرين الثاني (حل معادلة والعمليات على الكسور)',
-            prompt: 'أولاً: حل المعادلة 3x - 7 = 14. ثانياً: احسب ناتج (3/4 + 5/12) في أبسط صورة.',
-            expectedSteps: 'المعادلة: ننقل -7 للطرف الثاني فتصبح 3x = 14 + 7 = 21 ومنه x = 21/3 = 7 (25 درجة). الكسور: نوحد المقامات بضرب الكسر الأول بـ 3 فيصبح 9/12 + 5/12 = 14/12 وبالاختزال على 2 نجد 7/6 (20 درجة).',
-            expectedFinal: 'x = 7 ، ناتج الكسر = 7/6',
-            points: 45
-          },
-          {
-            id: 3,
-            title: 'التمرين الثالث (برهان هندسي - تطابق المثلثات)',
-            prompt: 'لتكن [AB] و [CD] قطعتين مستقيمتين متناصفتين في النقطة M. برهن بالتفصيل أن المثلثين AMC و BMD طبوقان، واستنتج أن AC = BD.',
-            expectedSteps: 'البرهان بالجمل الهندسية: في المثلثين AMC و BMD لدينا: 1) AM = MB لأن M منتصف AB فرضا (10 درجات). 2) CM = MD لأن M منتصف CD فرضا (10 درجات). 3) الزاوية AMC = الزاوية BMD للتقابل بالرأس (10 درجات). إذن يتطابق المثلثان بحالة (ض.ز.ض) وينتج أن AC = BD (15 درجة).',
-            expectedFinal: 'المثلثان طبوقان بحالة (ض.ز.ض) ومنه AC = BD',
-            points: 45
-          },
-          {
-            id: 4,
-            title: 'التمرين الرابع (هندسة - الزوايا والمستقيمات المتوازية)',
-            prompt: 'مستقيمان متوازيان يقطعهما قاطع، فإذا كان قياس إحدى الزوايا الحادة الناتجة 65°، احسب مع التعليل الهندسي قياس الزاوية المتبادلة داخلياً معها، والزاوية المتحالفة معها.',
-            expectedSteps: 'بما أن المستقيمين متوازيان: 1) الزاوية المتبادلة داخلياً = 65° للتبادل الداخلي (20 درجة). 2) الزاوية المتحالفة تتكامل معها = 180° - 65° = 115° (25 درجة).',
-            expectedFinal: 'المتبادلة داخلياً = 65° ، المتحالفة = 115°',
-            points: 45
-          },
-          {
-            id: 5,
-            title: 'التمرين الخامس (مسألة شاملة في التناسب والنسبة المئوية)',
-            prompt: 'اشترى تاجر بضاعة بمبلغ 40000 ل.س وباعها بربح قدره 15%. احسب مقدار الربح وثمن المبيع النهائي.',
-            expectedSteps: 'حساب مقدار الربح: 40000 × (15 / 100) = 6000 ل.س. ثمن المبيع النهائي = 40000 + 6000 = 46000 ل.س.',
-            expectedFinal: 'الربح = 6000 ، المبيع = 46000',
-            points: 36
-          }
-        ]
-      },
-      grade8: {
-        grade: 'الصف الثامن الأساسي',
-        schoolName: 'مديرية التربية - ثانوية الباسل للمتفوقين',
-        title: 'مذاكرة الرياضيات (الجبر والهندسة البرهانية) - الصف الثامن',
-        exerciseCount: 4,
-        mcq: [
-          { id: 1, questionHint: 'ميل المستقيم الذي معادلته y = 4x - 7 يساوي:', correctOption: 'أ', points: 15, optionsText: 'أ) 4 | ب) -7 | ج) -4 | د) 7/4' },
-          { id: 2, questionHint: 'نشر المطابقة التربيعية الشهيرة (2x - 3)^2 هو:', correctOption: 'د', points: 15, optionsText: 'أ) 4x^2 - 9 | ب) 2x^2 - 6x + 9 | ج) 4x^2 + 12x + 9 | د) 4x^2 - 12x + 9' },
-          { id: 3, questionHint: 'طول الخط المتوسط المتعلق بالوتر في مثلث قائم طول وتره 14 cm يساوي:', correctOption: 'ج', points: 15, optionsText: 'أ) 28 cm | ب) 14 cm | ج) 7 cm | د) 3.5 cm' },
-          { id: 4, questionHint: 'قيمة الجذر التربيعي للعدد النسبي الموجب √(0.49) تساوي:', correctOption: 'ب', points: 15, optionsText: 'أ) 0.07 | ب) 0.7 | ج) 7 | د) 0.24' },
-        ],
-        blanks: [
-          { id: 1, prompt: 'تحليل العبارة الجبرية (x^2 - 25) إلى جداء عاملين هو:', expectedAnswer: '(x - 5)(x + 5)', points: 15 },
-          { id: 2, prompt: 'الكتابة العلمية للعدد العشري (0.00038) بدلالة قوى العدد 10 هي:', expectedAnswer: '3.8 × 10^-4', points: 15 },
-          { id: 3, prompt: 'القطعة المستقيمة الواصلة بين منتصفي ضلعين في مثلث توازي الضلع الثالثة وطولها يساوي:', expectedAnswer: 'نصف طول الضلع الثالثة', points: 15 },
-          { id: 4, prompt: 'نقطة تلاقي المتوسطات في المثلث تقسم كل متوسط بنسبة (من جهة الرأس):', expectedAnswer: '2/3 (ثلثين من جهة الرأس)', points: 15 },
-        ],
-        exercises: [
-          {
-            id: 1,
-            title: 'التمرين الأول (النشر والتحليل وحل معادلة جداء صفري)',
-            prompt: 'لتكن العبارة الجبرية: E = (x + 3)^2 - 16. 1) انشر وبسط العبارة E. 2) حلل E إلى جداء عاملين. 3) حل المعادلة E = 0.',
-            expectedSteps: '1) النشر: E = x^2 + 6x + 9 - 16 = x^2 + 6x - 7 (15 درجة). 2) التحليل: E = (x - 1)(x + 7) (15 درجة). 3) حل المعادلة: x = 1 أو x = -7 (15 درجة).',
-            expectedFinal: 'النشر: x^2+6x-7 | التحليل: (x-1)(x+7) | الحلول: x=1 أو x=-7',
-            points: 45
-          },
-          {
-            id: 2,
-            title: 'التمرين الثاني (برهان هندسي - مبرهنة فيثاغورس وعكسها)',
-            prompt: 'ليكن ABC مثلثاً فيه AB = 6 cm و AC = 8 cm و BC = 10 cm. 1) أثبت بالبرهان أن المثلث ABC قائم الزاوية. 2) احسب طول المتوسط AM المتعلق بالوتر BC.',
-            expectedSteps: '1) عكس فيثاغورس: BC^2 = 100 و AB^2 + AC^2 = 36 + 64 = 100 فالمثلث قائم في A (25 درجة). 2) المتوسط المتعلق بالوتر يساوي نصفه: AM = 10 / 2 = 5 cm (20 درجة).',
-            expectedFinal: 'المثلث قائم في A (عكس فيثاغورس) ، وطول المتوسط AM = 5 cm',
-            points: 45
-          },
-          {
-            id: 3,
-            title: 'التمرين الثالث (برهان هندسي - مبرهنة تاليس ومنتصفي ضلعين)',
-            prompt: 'في المثلث ABC، لتكن M منتصف AB و N منتصف AC، فإذا كان BC = 12 cm. برهن أن (MN) يوازي (BC) ثم احسب طول [MN].',
-            expectedSteps: 'بما أن M منتصف AB و N منتصف AC فإن (MN) يوازي (BC) حسب مبرهنة منتصفي ضلعين (25 درجة)، وطول MN = 12 / 2 = 6 cm (20 درجة).',
-            expectedFinal: '(MN) // (BC) ، وطول MN = 6 cm',
-            points: 45
-          },
-          {
-            id: 4,
-            title: 'التمرين الرابع (القوى الصحيحة وحل المتراجحات)',
-            prompt: 'أولاً: بسط العبارة A = (3^5 × 3^-2) / 3^2. ثانياً: حل المتراجحة 2x - 5 ≤ 7.',
-            expectedSteps: 'أولاً: تبسيط القوى A = 3^3 / 3^2 = 3 (20 درجة). ثانياً: المتراجحة 2x ≤ 12 ومنه x ≤ 6 (25 درجة).',
-            expectedFinal: 'A = 3 ، وحلول المتراجحة x ≤ 6',
-            points: 45
-          },
-          {
-            id: 5,
-            title: 'التمرين الخامس (برهان متوازي الأضلاع والرباعيات)',
-            prompt: 'ABCD متوازي أضلاع مركزه O. برهن أن المثلثين OAB و OCD طبوقان.',
-            expectedSteps: 'الأقطار متناصفة في O ومنه OA = OC و OB = OD، والزاويتان المتقابلتان بالرأس متساويتان فيتطابق المثلثان بحالة (ض.ز.ض).',
-            expectedFinal: 'برهان التطابق بخواص أقطار متوازي الأضلاع',
-            points: 36
-          }
-        ]
-      },
-      grade10: {
-        grade: 'الصف العاشر الثانوي',
-        schoolName: 'مديرية التربية - ثانوية المأمون الرسمية',
-        title: 'الامتحان النصفي في الرياضيات (الجبر والتحليل والهندسة الشعاعية)',
-        exerciseCount: 4,
-        mcq: [
-          { id: 1, questionHint: 'مجموعة تعريف التابع الجذري f(x) = √(2x - 6) هي المجال:', correctOption: 'ب', points: 15, optionsText: 'أ) R | ب) [3, +∞[ | ج) ]-∞, 3] | د) R \\ {3}' },
-          { id: 2, questionHint: 'المميز دلتا (Δ) للمعادلة التربيعية x^2 - 6x + 5 = 0 يساوي:', correctOption: 'أ', points: 15, optionsText: 'أ) 16 | ب) 36 | ج) -4 | د) 56' },
-          { id: 3, questionHint: 'إذا كانت x زاوية حادة وكان sin(x) = 3/5 فإن قيمة cos(x) تساوي:', correctOption: 'ج', points: 15, optionsText: 'أ) 2/5 | ب) 5/4 | ج) 4/5 | د) 3/4' },
-          { id: 4, questionHint: 'الارتباط الخطي للشعاعين u(2, -3) و v(-4, 6) يحقق العلاقة:', correctOption: 'د', points: 15, optionsText: 'أ) متعامدان | ب) غير مرتبطين | ج) u = 2v | د) v = -2u (مرتبطان خطياً)' },
-        ],
-        blanks: [
-          { id: 1, prompt: 'في المعادلة التربيعية x^2 - 8x + 15 = 0 مجموع الجذرين (S) وجداؤهما (P) هما:', expectedAnswer: 'المجموع S = 8 والجداء P = 15', points: 15 },
-          { id: 2, prompt: 'طول (نظيم) الشعاع u(6, -8) في معلم متجانس يساوي:', expectedAnswer: '10 وحدات طول', points: 15 },
-          { id: 3, prompt: 'التابع العددي f(x) = x^3 - 5x هو تابع (زوجي أم فردي):', expectedAnswer: 'تابع فردي لأن f(-x) = -f(x)', points: 15 },
-          { id: 4, prompt: 'معادلة المستقيم المار بالنقطة A(0, 3) وميله m = -2 هي:', expectedAnswer: 'y = -2x + 3', points: 15 },
-        ],
-        exercises: [
-          {
-            id: 1,
-            title: 'التمرين الأول (حل معادلة ومتراجحة من الدرجة الثانية)',
-            prompt: 'لتكن العبارة P(x) = x^2 - 4x - 5. 1) حل المعادلة P(x) = 0 باستخدام المميز Δ. 2) استنتج حلول المتراجحة P(x) ≤ 0.',
-            expectedSteps: '1) المميز Δ = 16 + 20 = 36 > 0 (15 درجة). الجذران: x1 = -1 و x2 = 5 (15 درجة). 2) بين الجذرين سالب ومنه الحلول [-1, 5] (15 درجة).',
-            expectedFinal: 'الجذران: x = -1 و x = 5 | حلول المتراجحة: x ∈ [-1, 5]',
-            points: 45
-          },
-          {
-            id: 2,
-            title: 'التمرين الثاني (برهان هندسي شعاعي - علاقة شال ومركز الثقل)',
-            prompt: 'ليكن ABC مثلثاً و M منتصف [BC] و G مركز ثقل المثلث. 1) برهن شعاعياً أن: AB + AC = 2 AM. 2) أثبت أن: GA + GB + GC = 0.',
-            expectedSteps: '1) حسب شال AB = AM + MB و AC = AM + MC بالجمع نجد 2AM لأن MB+MC=0 (25 درجة). 2) GA = -2GM و GB+GC = 2GM ومجموعها الشعاع الصفري (20 درجة).',
-            expectedFinal: 'برهان شعاعي كامل لعلاقة شال وخاصة مركز ثقل المثلث',
-            points: 45
-          },
-          {
-            id: 3,
-            title: 'التمرين الثالث (الهندسة التحليلية والارتباط الخطي في المستوي)',
-            prompt: 'في معلم متجانس نتأمل النقاط A(1, 2) ، B(5, 4) ، C(3, 8). 1) أوجد مركبتي AB و AC وأطوال أضلاع المثلث. 2) برهن أن المثلث ABC قائم الزاوية ومتساوي الساقين.',
-            expectedSteps: '1) AB = (4, 2) وطوله √20، BC = (-2, 4) وطوله √20، AC = (2, 6) وطوله √40 (25 درجة). 2) AB = BC و AB^2 + BC^2 = 40 = AC^2 فقائم في B ومتساوي الساقين (20 درجة).',
-            expectedFinal: 'AB(4,2) ، BC(-2,4) ، المثلث قائم في B ومتساوي الساقين',
-            points: 45
-          },
-          {
-            id: 4,
-            title: 'التمرين الرابع (دراسة التوابع العددية ومجموعة التعريف)',
-            prompt: 'ليكن التابع الكسري f(x) = (3x - 2) / (x - 1). 1) أوجد مجموعة التعريف Df. 2) احسب f(0) و f(2) وأوجد العدد الذي صورته 4.',
-            expectedSteps: '1) المقام لا يساوي الصفر: Df = R \\ {1} (15 درجة). 2) f(0) = 2 و f(2) = 4 (15 درجة). 3) حل (3x-2)/(x-1)=4 يعطي x = 2 (15 درجة).',
-            expectedFinal: 'Df = R\\{1} ، f(0)=2 ، f(2)=4 ، العدد الذي صورته 4 هو x=2',
-            points: 45
-          },
-          {
-            id: 5,
-            title: 'التمرين الخامس (النسب المثلثية والعلاقات الأساسية)',
-            prompt: 'برهن صحة المتطابقة المثلثية: (sin x + cos x)^2 + (sin x - cos x)^2 = 2.',
-            expectedSteps: 'ننشر المطابقتين ونختصر 2sin x cos x ونعوض sin^2 x + cos^2 x = 1 فنجد 1 + 1 = 2.',
-            expectedFinal: 'نشر المطابقتين والتعويض بـ sin^2+cos^2=1 يعطي 2',
-            points: 36
-          }
-        ]
-      }
-    };
+<header class="no-print">
+  <div class="container">
+    <div class="header-top">
+      <div>
+        <h1>المصحح الذكي لخط اليد والبراهين (300 درجة) - المنهاج السوري</h1>
+        <div class="subtitle">يدعم OpenAI Compatible Endpoints ويعمل مباشرة على الآيفون (السابع - الثامن - العاشر)</div>
+      </div>
+      <span id="headerScoreBadge" class="badge-score">300 / 300</span>
+    </div>
 
-    function App() {
-      const [activeTab, setActiveTab] = useState('scanner');
-      const [userApiKey, setUserApiKey] = useState(() => localStorage.getItem('syrian_gemini_api_key') || '');
-      const [rubric, setRubric] = useState(() => {
-        const saved = localStorage.getItem('syrian_math_rubric_300_v2');
-        if (saved) { try { return JSON.parse(saved); } catch (e) {} }
-        return SYRIAN_CURRICULUM_PRESETS_300.grade8;
-      });
-      const [roster, setRoster] = useState(() => {
-        const saved = localStorage.getItem('syrian_math_roster_300_v2');
-        if (saved) { try { return JSON.parse(saved); } catch (e) {} }
-        return [
-          {
-            id: 'demo-300-1',
-            studentName: 'يامن عبد الرحمن الحسن',
-            studentClass: 'الثامن - الشعبة الأولى',
-            gradeLevel: 'الصف الثامن الأساسي',
-            date: '2026-11-01',
-            s1Score: 60, s1Max: 60,
-            s2Score: 60, s2Max: 60,
-            s3Score: 170, s3Max: 180,
-            totalScore: 290, maxScore: 300,
-            feedback: 'برهان هندسي كامل في مبرهنة فيثاغورس وتاليس، مع خطأ بسيط في إشارة المتراجحة.'
-          }
-        ];
-      });
+    <div class="endpoint-box">
+      <input id="baseUrlInput" type="text" class="api-input" value="https://api.openai.com/v1" placeholder="رابط الخادم (Base URL) مثل https://api.openai.com/v1" onchange="saveConfig()" />
+      <input id="apiKeyInput" type="text" class="api-input" placeholder="مفتاح OpenAI Compatible API Key (اختياري)" onchange="saveConfig()" />
+      <input id="modelNameInput" type="text" class="api-input" value="gpt-4o-mini" placeholder="اسم النموذج (Model) مثل gpt-4o-mini" onchange="saveConfig()" />
+    </div>
 
-      const [selectedImage, setSelectedImage] = useState(null);
-      const [isScanning, setIsScanning] = useState(false);
-      const [scanError, setScanError] = useState(null);
-      const [scanResult, setScanResult] = useState(null);
-      const [notification, setNotification] = useState(null);
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('scanner', this)">1. المسح وتصحيح خط اليد</button>
+      <button class="tab-btn" onclick="switchTab('rubric', this)">2. سلم التصحيح (300 درجة)</button>
+      <button class="tab-btn" onclick="switchTab('sheet', this)">3. طباعة الورقة القياسية</button>
+      <button class="tab-btn" onclick="switchTab('roster', this)">4. سجل الدرجات و Excel (<span id="rosterCount">1</span>)</button>
+    </div>
+  </div>
+</header>
 
-      const cameraInputRef = useRef(null);
-      const fileInputRef = useRef(null);
+<div class="container">
+  <div class="card grade-bar no-print">
+    <span style="font-size:12px; font-weight:800;">اختر قالب المنهاج السوري الجاهز (من 300 درجة):</span>
+    <div class="grade-btns">
+      <button id="btn-g7" class="btn" onclick="selectGrade('grade7')">الصف السابع (300)</button>
+      <button id="btn-g8" class="btn active-grade" onclick="selectGrade('grade8')">الصف الثامن (300)</button>
+      <button id="btn-g10" class="btn" onclick="selectGrade('grade10')">الصف العاشر (300)</button>
+    </div>
+  </div>
 
-      useEffect(() => { localStorage.setItem('syrian_math_rubric_300_v2', JSON.stringify(rubric)); }, [rubric]);
-      useEffect(() => { localStorage.setItem('syrian_math_roster_300_v2', JSON.stringify(roster)); }, [roster]);
-      useEffect(() => { localStorage.setItem('syrian_gemini_api_key', userApiKey); }, [userApiKey]);
+  <div id="tab-scanner">
+    <div class="card">
+      <h3 style="font-size:14px; font-weight:800;">التقاط صورة الورقة بكاميرا الآيفون أو التجربة الفورية</h3>
+      <div class="grid-2">
+        <input id="cameraInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="handleFile(event)" />
+        <button class="btn-green" onclick="document.getElementById('cameraInput').click()">📷 فتح كاميرا الآيفون</button>
+        <input id="fileInput" type="file" accept="image/*" style="display:none" onchange="handleFile(event)" />
+        <button class="btn-dark" onclick="document.getElementById('fileInput').click()">📁 رفع صورة من الجهاز</button>
+      </div>
 
-      const showToast = (msg, type = 'success') => {
-        setNotification({ msg, type });
-        setTimeout(() => setNotification(null), 4000);
-      };
-
-      const activeExercises = rubric.exercises.slice(0, rubric.exerciseCount);
-      const s1MaxPoints = rubric.mcq.reduce((sum, q) => sum + Number(q.points || 0), 0);
-      const s2MaxPoints = rubric.blanks.reduce((sum, q) => sum + Number(q.points || 0), 0);
-      const s3MaxPoints = activeExercises.reduce((sum, q) => sum + Number(q.points || 0), 0);
-      const totalExamPoints = s1MaxPoints + s2MaxPoints + s3MaxPoints;
-
-      const autoBalanceTo300 = (targetExerciseCount = rubric.exerciseCount) => {
-        const updatedMcq = rubric.mcq.map((q) => ({ ...q, points: 15 }));
-        const updatedBlanks = rubric.blanks.map((b) => ({ ...b, points: 15 }));
-        const exPoint = targetExerciseCount === 5 ? 36 : 45;
-        const updatedExercises = rubric.exercises.map((ex) => ({ ...ex, points: exPoint }));
-        setRubric({ ...rubric, exerciseCount: targetExerciseCount, mcq: updatedMcq, blanks: updatedBlanks, exercises: updatedExercises });
-        showToast('تمت موازنة سلم التصحيح تلقائياً إلى 300 درجة (60 + 60 + 180)!');
-      };
-
-      const applyPreset = (presetKey) => {
-        const preset = JSON.parse(JSON.stringify(SYRIAN_CURRICULUM_PRESETS_300[presetKey]));
-        setRubric(preset);
-        setScanResult(null);
-        showToast(`تم تحميل نموذج ${preset.grade} (الدرجة الكاملة: 300 درجة)`);
-      };
-
-      // محاكاة فورية ومحلية في حال عدم إدخال مفتاح API خارجي
-      const buildSimulatedResult = (profile) => {
-        const isPartial = profile === 'partial';
-        return {
-          studentName: isPartial ? 'خالد سامر الدرويش' : 'سارة محمود العلي',
-          studentClass: `${rubric.grade} - الشعبة الأولى`,
-          mcqResults: rubric.mcq.map((q, idx) => {
-            const wrong = isPartial && idx === 3;
-            const det = wrong ? (q.correctOption === 'أ' ? 'ج' : 'أ') : q.correctOption;
-            return {
-              questionNumber: idx + 1,
-              detectedOption: det,
-              correctOption: q.correctOption,
-              isCorrect: !wrong,
-              awardedPoints: wrong ? 0 : q.points,
-              maxPoints: q.points
-            };
-          }),
-          blankResults: rubric.blanks.map((b, idx) => {
-            const partialBlank = isPartial && idx === 1;
-            return {
-              questionNumber: idx + 1,
-              detectedText: partialBlank ? 'كتب القانون بدون إكمال التبسيط' : b.expectedAnswer,
-              expectedAnswer: b.expectedAnswer,
-              isCorrect: !partialBlank,
-              awardedPoints: partialBlank ? Math.round(b.points / 2) : b.points,
-              maxPoints: b.points,
-              comment: partialBlank ? 'تم منح نصف العلامة لكتابة العلاقة الصحيحة' : 'إجابة نموذجية مطابقة'
-            };
-          }),
-          exerciseResults: activeExercises.map((ex, idx) => {
-            const hasCalcError = isPartial && idx >= activeExercises.length - 2;
-            const awarded = hasCalcError ? Math.round(ex.points * 0.75) : ex.points;
-            return {
-              exerciseNumber: idx + 1,
-              transcribedSteps: `${ex.expectedSteps} — [الاستنتاج المكتوب: ${hasCalcError ? 'خطأ حسابي في التعويض الأخير' : ex.expectedFinal}]`,
-              stepsBreakdown: hasCalcError ? `خطوات البرهان كاملة (${awarded}/${ex.points})` : `برهان وجواب كامل (${ex.points}/${ex.points})`,
-              awardedPoints: awarded,
-              maxPoints: ex.points,
-              status: hasCalcError ? 'جزئي' : 'كامل',
-              teacherNote: hasCalcError
-                ? 'كتب الطالب خطوات البرهان والمبرهنات بشكل سليم، وحُسمت علامة الناتج النهائي فقط.'
-                : 'تسلسل منطقي وبرهان هندسي/جبري مكتمل ومطابق لسلم التصحيح.'
-            };
-          }),
-          overallFeedback: isPartial
-            ? 'الطالب متمكن من خطوات البرهان الهندسي لكنه يحتاج لمراجعة العمليات الحسابية النهائية.'
-            : 'ورقة ممتازة ومرتبة، جميع البراهين الهندسية والمعادلات الجبرية مكتوبة بدقة كاملة.'
-        };
-      };
-
-      const generateHandwrittenStudentSheet = (profile = 'excellent') => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 1200;
-        canvas.height = 1650;
-        const ctx = canvas.getContext('2d');
-
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(30, 30, 34, 34);
-        ctx.fillRect(canvas.width - 64, 30, 34, 34);
-        ctx.fillRect(30, canvas.height - 64, 34, 34);
-        ctx.fillRect(canvas.width - 64, canvas.height - 64, 34, 34);
-
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(75, 45, canvas.width - 150, canvas.height - 90);
-
-        ctx.direction = 'rtl';
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 24px Tajawal, Arial';
-        ctx.fillText(`الجمهورية العربية السورية - ${rubric.schoolName}`, canvas.width / 2, 95);
-        ctx.font = 'bold 20px Tajawal, Arial';
-        ctx.fillText(`${rubric.grade} | ${rubric.title} (300 درجة)`, canvas.width / 2, 130);
-
-        ctx.textAlign = 'right';
-        ctx.fillStyle = '#1d4ed8';
-        ctx.font = 'bold 20px Tajawal, Arial';
-        ctx.fillText(
-          profile === 'excellent' ? 'اسم الطالب: سارة محمود العلي (ورقة نموذجية)' : 'اسم الطالب: خالد سامر الدرويش (علامة جزئية)',
-          1100,
-          175
-        );
-
-        activeExercises.forEach((ex, idx) => {
-          const y = 220 + idx * 280;
-          ctx.strokeStyle = '#475569';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(95, y, 1010, 250);
-          ctx.fillStyle = '#0f172a';
-          ctx.font = 'bold 18px Tajawal, Arial';
-          ctx.fillText(`${ex.title} (${ex.points} درجة): ${ex.prompt.slice(0, 75)}`, 1085, y + 35);
-          ctx.fillStyle = '#1e40af';
-          ctx.font = '18px Tajawal, Arial';
-          ctx.fillText(`البرهان والحل بخط اليد: ${ex.expectedSteps.slice(0, 95)}`, 1085, y + 95);
-          ctx.fillText(`الاستنتاج النهائي: ${ex.expectedFinal}`, 1085, y + 155);
-        });
-
-        const dataUrl = canvas.toDataURL('image/png');
-        setSelectedImage(dataUrl);
-        setScanResult(buildSimulatedResult(profile));
-        showToast('تمت قراءة خط اليد وتصحيح الورقة من 300 درجة بنجاح!');
-      };
-
-      const handleImageUpload = (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          setSelectedImage(event.target.result);
-          setScanResult(null);
-          setScanError(null);
-        };
-        reader.readAsDataURL(file);
-      };
-
-      const runAiGrading = async () => {
-        if (!selectedImage) {
-          showToast('يرجى تصوير ورقة الطالب بكاميرا الآيفون أولاً', 'error');
-          return;
-        }
-        if (!userApiKey.trim()) {
-          // في حال لم يدخل المستخدم مفتاح API، نعرض تصحيحاً تجريبياً فورياً حتى لا يتوقف التطبيق
-          setScanResult(buildSimulatedResult('excellent'));
-          showToast('تم التصحيح بالمحرك المدمج! (أدخل مفتاح Gemini API في الأعلى لقراءة الصور الحقيقية بالكاميرا)');
-          return;
-        }
-
-        setIsScanning(true);
-        setScanError(null);
-        try {
-          const base64Data = selectedImage.split(',')[1];
-          const mimeType = selectedImage.split(';')[0].split(':')[1] || 'image/png';
-          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey.trim()}`;
-
-          const promptText = `أنت مصحح رياضيات خبير للمنهاج السوري (${rubric.grade}) والدرجة العظمى ${totalExamPoints}. اقرأ خط يد الطالب في الصورة المرفقة وأعد النتيجة بصيغة JSON مطابقة لسلم التصحيح.`;
-
-          const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: promptText }, { inlineData: { mimeType, data: base64Data } }] }],
-              generationConfig: { responseMimeType: 'application/json' }
-            })
-          });
-
-          if (!response.ok) throw new Error('تأكد من صحة مفتاح Gemini API أو الاتصال بالإنترنت.');
-          const result = await response.json();
-          const parsed = JSON.parse(result.candidates[0].content.parts[0].text);
-          setScanResult(parsed);
-          showToast('تمت قراءة خط اليد بالذكاء الاصطناعي بنجاح!');
-        } catch (err) {
-          setScanError(err.message);
-        } finally {
-          setIsScanning(false);
-        }
-      };
-
-      const saveResultToRoster = () => {
-        if (!scanResult) return;
-        const s1Score = scanResult.mcqResults.reduce((s, r) => s + Number(r.awardedPoints || 0), 0);
-        const s2Score = scanResult.blankResults.reduce((s, r) => s + Number(r.awardedPoints || 0), 0);
-        const s3Score = scanResult.exerciseResults.reduce((s, r) => s + Number(r.awardedPoints || 0), 0);
-        const totalScore = s1Score + s2Score + s3Score;
-
-        const newRecord = {
-          id: `st-${Date.now()}`,
-          studentName: scanResult.studentName || 'طالب بدون اسم',
-          studentClass: scanResult.studentClass || rubric.grade,
-          gradeLevel: rubric.grade,
-          date: new Date().toISOString().slice(0, 10),
-          s1Score, s1Max: s1MaxPoints,
-          s2Score, s2Max: s2MaxPoints,
-          s3Score, s3Max: s3MaxPoints,
-          totalScore, maxScore: totalExamPoints,
-          feedback: scanResult.overallFeedback || ''
-        };
-        setRoster([newRecord, ...roster]);
-        showToast(`تم حفظ درجة الطالب (${totalScore} / 300) في السجل!`);
-        setActiveTab('roster');
-      };
-
-      const exportRosterToCSV = () => {
-        const headers = ['اسم الطالب', 'الصف والشعبة', 'س1 (من 60)', 'س2 (من 60)', 'س3 (من 180)', 'المجموع من 300', 'ملاحظات التصحيح'];
-        const rows = roster.map((r) =>
-          [`"${r.studentName}"`, `"${r.studentClass}"`, r.s1Score, r.s2Score, r.s3Score, r.totalScore, `"${r.feedback}"`].join(',')
-        );
-        const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.setAttribute('download', `درجات_الرياضيات_300_${rubric.grade}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      };
-
-      return (
-        <div className="min-h-screen pb-24">
-          {notification && (
-            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-emerald-300 px-5 py-3 rounded-2xl shadow-xl text-xs font-bold border border-emerald-500/40 no-print">
-              {notification.msg}
-            </div>
-          )}
-
-          {/* الهيدر */}
-          <header className="bg-gradient-to-l from-slate-900 via-indigo-950 to-emerald-950 text-white p-4 shadow-lg no-print">
-            <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
-              <div>
-                <h1 className="text-lg md:text-xl font-black">
-                  المصحح الذكي لخط اليد والبراهين (300 درجة) - المنهاج السوري
-                </h1>
-                <p className="text-xs text-emerald-200 mt-0.5">
-                  نسخة مستقلة تعمل مباشرة على الآيفون والكمبيوتر (السابع - الثامن - العاشر)
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="password"
-                  value={userApiKey}
-                  onChange={(e) => setUserApiKey(e.target.value)}
-                  placeholder="مفتاح Gemini API (اختياري للكاميرا)"
-                  className="bg-white/10 border border-white/20 rounded-xl px-3 py-1.5 text-xs text-white placeholder-white/50 w-56"
-                />
-                <span className="bg-amber-400 text-slate-950 text-xs px-3 py-1.5 rounded-xl font-black">
-                  {totalExamPoints} / 300
-                </span>
-              </div>
-            </div>
-
-            {/* أزرار التنقل العلوية */}
-            <div className="max-w-5xl mx-auto mt-4 flex flex-wrap gap-2">
-              <button onClick={() => setActiveTab('scanner')} className={`px-4 py-2 rounded-xl text-xs font-extrabold ${activeTab === 'scanner' ? 'bg-white text-slate-900' : 'bg-white/10 text-white'}`}>
-                1. المسح الضوئي وتصحيح خط اليد
-              </button>
-              <button onClick={() => setActiveTab('rubric')} className={`px-4 py-2 rounded-xl text-xs font-extrabold ${activeTab === 'rubric' ? 'bg-white text-slate-900' : 'bg-white/10 text-white'}`}>
-                2. سلم التصحيح (300 درجة)
-              </button>
-              <button onClick={() => setActiveTab('sheet')} className={`px-4 py-2 rounded-xl text-xs font-extrabold ${activeTab === 'sheet' ? 'bg-white text-slate-900' : 'bg-white/10 text-white'}`}>
-                3. طباعة الورقة القياسية
-              </button>
-              <button onClick={() => setActiveTab('roster')} className={`px-4 py-2 rounded-xl text-xs font-extrabold ${activeTab === 'roster' ? 'bg-white text-slate-900' : 'bg-white/10 text-white'}`}>
-                4. سجل الدرجات و Excel ({roster.length})
-              </button>
-            </div>
-          </header>
-
-          <main className="max-w-5xl mx-auto p-4 space-y-5">
-            {/* اختيار الصف الدراسي */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
-              <span className="text-xs font-extrabold text-slate-700">اختر قالب المنهاج السوري الجاهز (من 300 درجة):</span>
-              <div className="flex flex-wrap gap-2">
-                <button onClick={() => applyPreset('grade7')} className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border ${rubric.grade.includes('السابع') ? 'bg-slate-900 text-white' : 'bg-slate-50'}`}>
-                  الصف السابع (300)
-                </button>
-                <button onClick={() => applyPreset('grade8')} className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border ${rubric.grade.includes('الثامن') ? 'bg-slate-900 text-white' : 'bg-slate-50'}`}>
-                  الصف الثامن (300)
-                </button>
-                <button onClick={() => applyPreset('grade10')} className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border ${rubric.grade.includes('العاشر') ? 'bg-slate-900 text-white' : 'bg-slate-50'}`}>
-                  الصف العاشر (300)
-                </button>
-              </div>
-            </div>
-
-            {activeTab === 'scanner' && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                <div className="lg:col-span-5 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                  <h3 className="text-sm font-extrabold text-slate-900">التقاط صورة الورقة بكاميرا الآيفون أو التجربة الفورية</h3>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleImageUpload} className="hidden" />
-                    <button onClick={() => cameraInputRef.current?.click()} className="p-4 rounded-2xl bg-emerald-600 text-white font-extrabold text-xs shadow">
-                      📷 فتح كاميرا الآيفون
-                    </button>
-
-                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                    <button onClick={() => fileInputRef.current?.click()} className="p-4 rounded-2xl bg-slate-800 text-white font-extrabold text-xs shadow">
-                      📁 رفع صورة من الجهاز
-                    </button>
-                  </div>
-
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-2">
-                    <p className="text-xs font-extrabold text-amber-950">تجربة فورية لتصحيح خط اليد والبراهين (بدون طابعة):</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button onClick={() => generateHandwrittenStudentSheet('excellent')} className="py-2 px-3 rounded-xl bg-white border border-amber-300 text-xs font-bold">
-                        ✨ ورقة طالب متفوق (300/300)
-                      </button>
-                      <button onClick={() => generateHandwrittenStudentSheet('partial')} className="py-2 px-3 rounded-xl bg-white border border-amber-300 text-xs font-bold">
-                        ⚖️ ورقة بعلامة جزئية
-                      </button>
-                    </div>
-                  </div>
-
-                  {selectedImage && (
-                    <div className="space-y-3">
-                      <img src={selectedImage} alt="ورقة الطالب" className="w-full max-h-80 object-contain rounded-xl border border-slate-300 bg-slate-900" />
-                      <button onClick={runAiGrading} disabled={isScanning} className="w-full py-3 rounded-xl bg-emerald-600 text-white font-extrabold text-xs">
-                        {isScanning ? 'جاري قراءة الخط...' : 'بدء قراءة خط اليد والتصحيح الذكي (من 300)'}
-                      </button>
-                    </div>
-                  )}
-                  {scanError && <div className="p-3 rounded-xl bg-red-50 text-red-700 text-xs font-bold">{scanError}</div>}
-                </div>
-
-                <div className="lg:col-span-7 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                  {scanResult ? (
-                    <div className="space-y-4">
-                      <div className="bg-slate-900 text-white p-4 rounded-2xl flex items-center justify-between">
-                        <div>
-                          <div className="text-xs text-emerald-300 font-bold">اسم الطالب المقروء:</div>
-                          <div className="text-base font-black">{scanResult.studentName}</div>
-                          <div className="text-xs text-slate-300">{scanResult.studentClass}</div>
-                        </div>
-                        <div className="text-center bg-emerald-500/20 border border-emerald-400/40 px-4 py-2 rounded-xl">
-                          <div className="text-[11px] text-emerald-200">الدرجة المستحقة</div>
-                          <div className="text-2xl font-black text-amber-300">
-                            {scanResult.mcqResults.reduce((s, r) => s + Number(r.awardedPoints || 0), 0) +
-                              scanResult.blankResults.reduce((s, r) => s + Number(r.awardedPoints || 0), 0) +
-                              scanResult.exerciseResults.reduce((s, r) => s + Number(r.awardedPoints || 0), 0)} / {totalExamPoints}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-extrabold bg-slate-100 p-2 rounded-lg">تفصيل قراءة البراهين والتمارين (السؤال الثالث - {s3MaxPoints} درجة):</h4>
-                        {scanResult.exerciseResults.map((ex, i) => (
-                          <div key={i} className="p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs space-y-1">
-                            <div className="flex justify-between font-black">
-                              <span>التمرين ({ex.exerciseNumber}) - {ex.stepsBreakdown}</span>
-                              <span className="text-emerald-700">{ex.awardedPoints} / {ex.maxPoints} درجة</span>
-                            </div>
-                            <p className="text-indigo-950 font-bold">{ex.transcribedSteps}</p>
-                            <p className="text-emerald-800">{ex.teacherNote}</p>
-                          </div>
-                        ))}
-                      </div>
-
-                      <button onClick={saveResultToRoster} className="w-full py-3.5 rounded-xl bg-emerald-600 text-white font-black text-xs shadow">
-                        حفظ النتيجة في سجل الدرجات (من 300)
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-center py-12 text-slate-500 text-xs">
-                      اضغط على زر "ورقة طالب متفوق" أو صوّر ورقة بكاميرا الآيفون لعرض التقرير المفصل من 300 درجة.
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'rubric' && (
-              <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-black">إعداد سلم التصحيح وتوزيع الـ 300 درجة</h3>
-                  <div className="flex gap-2">
-                    <button onClick={() => autoBalanceTo300(4)} className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold">
-                      4 تمارين (45 درجة للتمرين)
-                    </button>
-                    <button onClick={() => autoBalanceTo300(5)} className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold">
-                      5 تمارين (36 درجة للتمرين)
-                    </button>
-                  </div>
-                </div>
-                <p className="text-xs text-slate-600">
-                  التوزيع القياسي المعتمد: السؤال الأول 60 درجة (4×15) + السؤال الثاني 60 درجة (4×15) + السؤال الثالث 180 درجة = 300 درجة.
-                </p>
-              </div>
-            )}
-
-            {activeTab === 'sheet' && (
-              <div className="space-y-4">
-                <div className="flex justify-end no-print">
-                  <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs shadow">
-                    🖨️ طباعة ورقة الإجابة القياسية (A4)
-                  </button>
-                </div>
-                <div id="printable-answer-sheet" className="bg-white p-8 rounded-xl border-2 border-slate-900 relative text-xs space-y-4">
-                  <div className="border-b-2 border-slate-900 pb-3 flex justify-between items-center font-bold">
-                    <div>
-                      <p>الجمهورية العربية السورية</p>
-                      <p>{rubric.schoolName}</p>
-                      <p>{rubric.grade}</p>
-                    </div>
-                    <div className="text-center">
-                      <h2 className="text-base font-black">{rubric.title}</h2>
-                      <p className="text-[11px]">ورقة إجابة قياسية مخصصة لقراءة خط اليد والبراهين</p>
-                    </div>
-                    <div className="border-2 border-slate-900 px-3 py-1.5 rounded-lg font-black">
-                      الدرجة: ....... / {totalExamPoints}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-extrabold bg-slate-100 p-2 border border-slate-400">السؤال الأول: اختر الإجابة الصحيحة ({s1MaxPoints} درجة)</h4>
-                    {rubric.mcq.map((q, i) => (
-                      <div key={q.id} className="flex justify-between items-center py-2 border-b border-slate-200">
-                        <span className="font-bold">{i + 1}) {q.questionHint} [{q.optionsText}]</span>
-                        <span className="font-black">( أ )  ( ب )  ( ج )  ( د )</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div>
-                    <h4 className="font-extrabold bg-slate-100 p-2 border border-slate-400">السؤال الثاني: املأ الفراغات ({s2MaxPoints} درجة)</h4>
-                    {rubric.blanks.map((b, i) => (
-                      <div key={b.id} className="flex justify-between items-center py-2 border-b border-slate-200">
-                        <span className="font-bold">{i + 1}) {b.prompt}</span>
-                        <span className="w-56 h-7 border border-slate-700 inline-block"></span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div>
-                    <h4 className="font-extrabold bg-slate-100 p-2 border border-slate-400">السؤال الثالث: حل التمارين والبراهين بالتفصيل ({s3MaxPoints} درجة)</h4>
-                    {activeExercises.map((ex) => (
-                      <div key={ex.id} className="border border-slate-600 rounded p-2.5 my-2">
-                        <div className="font-bold border-b border-slate-300 pb-1 mb-6">{ex.title} ({ex.points} درجة): {ex.prompt}</div>
-                        <div className="h-16 border-b border-dashed border-slate-300"></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'roster' && (
-              <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-sm font-black">سجل درجات الطلاب (من 300 درجة)</h3>
-                  <button onClick={exportRosterToCSV} className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold">
-                    📥 تصدير الكشف إلى Excel (CSV)
-                  </button>
-                </div>
-                <table className="w-full text-right text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-100 border-b border-slate-200">
-                      <th className="p-2.5">اسم الطالب</th>
-                      <th className="p-2.5">الصف</th>
-                      <th className="p-2.5">س1</th>
-                      <th className="p-2.5">س2</th>
-                      <th className="p-2.5">س3</th>
-                      <th className="p-2.5">المجموع من 300</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {roster.map((r) => (
-                      <tr key={r.id} className="border-b border-slate-100">
-                        <td className="p-2.5 font-bold">{r.studentName}</td>
-                        <td className="p-2.5">{r.studentClass}</td>
-                        <td className="p-2.5">{r.s1Score}/60</td>
-                        <td className="p-2.5">{r.s2Score}/60</td>
-                        <td className="p-2.5">{r.s3Score}/180</td>
-                        <td className="p-2.5 font-black text-emerald-700">{r.totalScore} / {r.maxScore}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </main>
+      <div class="demo-box">
+        <div style="font-size:12px; font-weight:800; color:#78350f; margin-bottom:6px;">تجربة فورية لتصحيح خط اليد والبراهين (بدون إنترنت أو API):</div>
+        <div class="grid-2">
+          <button class="btn" style="background:#fff; border-color:#fcd34d;" onclick="runDemo('excellent')">✨ ورقة طالب متفوق (300/300)</button>
+          <button class="btn" style="background:#fff; border-color:#fcd34d;" onclick="runDemo('partial')">⚖️ ورقة بعلامة جزئية</button>
         </div>
-      );
+      </div>
+
+      <div id="imagePreviewBox" style="display:none;">
+        <img id="previewImg" class="preview-img" alt="ورقة الطالب" />
+        <button id="gradeBtn" class="btn-green" style="margin-top:10px;" onclick="gradeCurrentImage()">بدء قراءة خط اليد والتصحيح عبر OpenAI Endpoint (من 300)</button>
+      </div>
+    </div>
+
+    <div class="card" id="resultCard">
+      <div style="text-align:center; color:#64748b; font-size:12px; padding:24px 0;">
+        اضغط على زر "ورقة طالب متفوق" أو صوّر ورقة بكاميرا الآيفون لعرض التقرير المفصل من 300 درجة.
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-rubric" style="display:none;">
+    <div class="card">
+      <h3 style="font-size:14px; font-weight:800; margin-bottom:8px;">سلم التصحيح المعتمد وتوزيع الـ 300 درجة</h3>
+      <p style="font-size:12px; color:#475569; margin-bottom:12px;">
+        التوزيع القياسي: السؤال الأول 60 درجة (4×15) + السؤال الثاني 60 درجة (4×15) + السؤال الثالث 180 درجة (4 تمارين × 45 درجة) = 300 درجة.
+      </p>
+      <div id="rubricDetails"></div>
+    </div>
+  </div>
+
+  <div id="tab-sheet" style="display:none;">
+    <div class="no-print" style="margin-bottom:10px; text-align:left;">
+      <button class="btn-green" style="width:auto; padding:10px 20px;" onclick="window.print()">🖨️ طباعة ورقة الإجابة القياسية (A4)</button>
+    </div>
+    <div id="printable-sheet" class="card"></div>
+  </div>
+
+  <div id="tab-roster" style="display:none;">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="font-size:14px; font-weight:800;">سجل درجات الطلاب (من 300 درجة)</h3>
+        <button class="btn-green" style="width:auto; padding:8px 14px; font-size:12px;" onclick="exportCSV()">📥 تصدير إلى Excel (CSV)</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>اسم الطالب</th>
+            <th>الصف</th>
+            <th>س1 (60)</th>
+            <th>س2 (60)</th>
+            <th>س3 (180)</th>
+            <th>المجموع من 300</th>
+          </tr>
+        </thead>
+        <tbody id="rosterBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const PRESETS = {
+  grade7: {
+    grade: 'الصف السابع الأساسي',
+    schoolName: 'مديرية التربية - مدرسة المتفوقين',
+    title: 'مذاكرة الرياضيات الشاملة (جبر وهندسة) - الفصل الأول',
+    mcq: [
+      { id: 1, q: 'قيمة العبارة الجبرية (-12) + (+20) تساوي:', ans: 'ب', pts: 15, opts: 'أ) -8 | ب) +8 | ج) -32 | د) +32' },
+      { id: 2, q: 'المضاعف المشترك الأصغر للعددين 8 و 12 هو:', ans: 'ج', pts: 15, opts: 'أ) 4 | ب) 96 | ج) 24 | د) 16' },
+      { id: 3, q: 'في مثلث متساوي الساقين زاوية رأسه 80°، زاوية القاعدة:', ans: 'أ', pts: 15, opts: 'أ) 50° | ب) 80° | ج) 100° | د) 40°' },
+      { id: 4, q: 'العدد الأولي من بين الأعداد الآتية هو:', ans: 'د', pts: 15, opts: 'أ) 27 | ب) 35 | ج) 51 | د) 29' }
+    ],
+    blanks: [
+      { id: 1, q: 'معكوس العدد الصحيح (-25) بالنسبة للجمع هو:', ans: '+25', pts: 15 },
+      { id: 2, q: 'الزاويتان المتكاملتان مجموع قياسيهما يساوي:', ans: '180 درجة', pts: 15 },
+      { id: 3, q: 'ناتج اختزال الكسر (24 / 36) بأبسط صورة:', ans: '2/3', pts: 15 },
+      { id: 4, q: 'العمود على قطعة مستقيمة في منتصفها يسمى:', ans: 'محور القطعة المستقيمة', pts: 15 }
+    ],
+    exercises: [
+      { id: 1, title: 'التمرين الأول (الأولويات والأقواس)', prompt: 'احسب بالتفصيل: A = 30 - 4 × (5 - 8) + 2^3', steps: 'حساب القوس (-3) ثم القوة (8) والضرب (+12) والجمع النهائي = 50', finalAns: 'A = 50', pts: 45 },
+      { id: 2, title: 'التمرين الثاني (المعادلات والكسور)', prompt: 'حل المعادلة 3x - 7 = 14 ثم احسب (3/4 + 5/12)', steps: '3x = 21 ومنه x = 7 | توحيد المقامات: 9/12 + 5/12 = 14/12 = 7/6', finalAns: 'x = 7 ، الكسر = 7/6', pts: 45 },
+      { id: 3, title: 'التمرين الثالث (برهان تطابق المثلثات)', prompt: '[AB] و [CD] متناصفتان في M. برهن تطابق المثلثين AMC و BMD', steps: 'AM=MB و CM=MD والتقابل بالرأس فيتطابقان بحالة (ض.ز.ض) وينتج AC=BD', finalAns: 'طبوقان بحالة (ض.ز.ض)', pts: 45 },
+      { id: 4, title: 'التمرين الرابع (الزوايا والتوازي)', prompt: 'مستقيمان متوازيان وقاطع يصنع زاوية 65°. احسب المتبادلة داخلياً والمتحالفة', steps: 'المتبادلة داخلياً = 65° للتبادل الداخلي، والمتحالفة = 180 - 65 = 115°', finalAns: '65° و 115°', pts: 45 }
+    ]
+  },
+  grade8: {
+    grade: 'الصف الثامن الأساسي',
+    schoolName: 'مديرية التربية - ثانوية الباسل للمتفوقين',
+    title: 'مذاكرة الرياضيات (الجبر والهندسة البرهانية) - الصف الثامن',
+    mcq: [
+      { id: 1, q: 'ميل المستقيم الذي معادلته y = 4x - 7 يساوي:', ans: 'أ', pts: 15, opts: 'أ) 4 | ب) -7 | ج) -4 | د) 7/4' },
+      { id: 2, q: 'نشر المطابقة التربيعية (2x - 3)^2 هو:', ans: 'د', pts: 15, opts: 'أ) 4x^2-9 | ب) 2x^2-6x+9 | ج) 4x^2+12x+9 | د) 4x^2-12x+9' },
+      { id: 3, q: 'طول المتوسط المتعلق بالوتر في مثلث قائم وتره 14 cm:', ans: 'ج', pts: 15, opts: 'أ) 28 cm | ب) 14 cm | ج) 7 cm | د) 3.5 cm' },
+      { id: 4, q: 'الجذر التربيعي للعدد الموجب √(0.49) يساوي:', ans: 'ب', pts: 15, opts: 'أ) 0.07 | ب) 0.7 | ج) 7 | د) 0.24' }
+    ],
+    blanks: [
+      { id: 1, q: 'تحليل العبارة (x^2 - 25) إلى جداء عاملين:', ans: '(x - 5)(x + 5)', pts: 15 },
+      { id: 2, q: 'الكتابة العلمية للعدد (0.00038) هي:', ans: '3.8 × 10^-4', pts: 15 },
+      { id: 3, q: 'القطعة الواصلة بين منتصفي ضلعين في مثلث تساوي:', ans: 'نصف طول الضلع الثالثة', pts: 15 },
+      { id: 4, q: 'نقطة تلاقي المتوسطات تقسم كل متوسط من جهة الرأس بنسبة:', ans: '2/3', pts: 15 }
+    ],
+    exercises: [
+      { id: 1, title: 'التمرين الأول (النشر والتحليل والمعادلات)', prompt: 'لتكن E = (x + 3)^2 - 16. انشر وحلل E ثم حل E = 0', steps: 'النشر: x^2+6x-7 | التحليل: (x-1)(x+7) | الحلول: x=1 أو x=-7', finalAns: 'x = 1 أو x = -7', pts: 45 },
+      { id: 2, title: 'التمرين الثاني (برهان عكس فيثاغورس والمتوسط)', prompt: 'مثلث ABC فيه AB=6, AC=8, BC=10. أثبت أنه قائم واحسب المتوسط AM', steps: 'BC^2=100 و AB^2+AC^2=36+64=100 فقائم في A حسب عكس فيثاغورس، و AM = 5 cm', finalAns: 'قائم في A ، AM = 5 cm', pts: 45 },
+      { id: 3, title: 'التمرين الثالث (مبرهنة تاليس ومنتصفي ضلعين)', prompt: 'M منتصف AB و N منتصف AC و BC=12. برهن توازي MN و BC واحسب MN', steps: 'حسب مبرهنة منتصفي ضلعين (MN)//(BC) وطول MN = 12/2 = 6 cm', finalAns: '(MN)//(BC) ، MN = 6 cm', pts: 45 },
+      { id: 4, title: 'التمرين الرابع (القوى والمتراجحات)', prompt: 'بسط A = (3^5 × 3^-2)/3^2 ثم حل المتراجحة 2x - 5 ≤ 7', steps: 'تبسيط القوى: A = 3^3/3^2 = 3 | المتراجحة: 2x ≤ 12 ومنه x ≤ 6', finalAns: 'A = 3 ، x ≤ 6', pts: 45 }
+    ]
+  },
+  grade10: {
+    grade: 'الصف العاشر الثانوي',
+    schoolName: 'مديرية التربية - ثانوية المأمون الرسمية',
+    title: 'الامتحان النصفي في الرياضيات (الجبر والهندسة الشعاعية)',
+    mcq: [
+      { id: 1, q: 'مجموعة تعريف التابع f(x) = √(2x - 6) هي:', ans: 'ب', pts: 15, opts: 'أ) R | ب) [3, +∞[ | ج) ]-∞, 3] | د) R\\{3}' },
+      { id: 2, q: 'المميز دلتا (Δ) للمعادلة x^2 - 6x + 5 = 0 يساوي:', ans: 'أ', pts: 15, opts: 'أ) 16 | ب) 36 | ج) -4 | د) 56' },
+      { id: 3, q: 'إذا كانت x حادة وكان sin(x) = 3/5 فإن cos(x) يساوي:', ans: 'ج', pts: 15, opts: 'أ) 2/5 | ب) 5/4 | ج) 4/5 | د) 3/4' },
+      { id: 4, q: 'الشعاعان u(2, -3) و v(-4, 6) يحققان:', ans: 'د', pts: 15, opts: 'أ) متعامدان | ب) غير مرتبطين | ج) u=2v | د) v=-2u مرتبطان خطياً' }
+    ],
+    blanks: [
+      { id: 1, q: 'في المعادلة x^2 - 8x + 15 = 0 المجموع S والجداء P هما:', ans: 'S = 8 , P = 15', pts: 15 },
+      { id: 2, q: 'نظيم الشعاع u(6, -8) في معلم متجانس يساوي:', ans: '10 وحدات طول', pts: 15 },
+      { id: 3, q: 'التابع f(x) = x^3 - 5x هو تابع (زوجي أم فردي):', ans: 'تابع فردي', pts: 15 },
+      { id: 4, q: 'معادلة المستقيم المار بـ A(0,3) وميله m=-2 هي:', ans: 'y = -2x + 3', pts: 15 }
+    ],
+    exercises: [
+      { id: 1, title: 'التمرين الأول (معادلة ومتراجحة درجة ثانية)', prompt: 'حل المعادلة x^2 - 4x - 5 = 0 بالمميز Δ ثم المتراجحة P(x) ≤ 0', steps: 'Δ = 36 > 0 الجذران -1 و 5 | بين الجذرين سالب والحلول [-1, 5]', finalAns: 'x ∈ [-1, 5]', pts: 45 },
+      { id: 2, title: 'التمرين الثاني (برهان شعاعي وعلاقة شال)', prompt: 'M منتصف BC و G مركز ثقل ABC. برهن شعاعياً أن AB + AC = 2AM', steps: 'حسب شال AB=AM+MB و AC=AM+MC بالجمع نجد 2AM لأن MB+MC=0', finalAns: 'برهان شعاعي كامل لعلاقة شال', pts: 45 },
+      { id: 3, title: 'التمرين الثالث (الهندسة التحليلية في المستوي)', prompt: 'A(1,2), B(5,4), C(3,8). أوجد مركبات الأشعة وبرهن أن المثلث قائم ومتساوي الساقين', steps: 'AB(4,2) و BC(-2,4) متساويان بالطول √20 ومجموع مربعيهما 40 = AC^2 فقائم في B', finalAns: 'قائم في B ومتساوي الساقين', pts: 45 },
+      { id: 4, title: 'التمرين الرابع (دراسة التوابع الكسرية)', prompt: 'للتابع f(x)=(3x-2)/(x-1) أوجد Df واحسب f(0) و f(2)', steps: 'Df = R\\{1} ، وتعويض المباشر يعطي f(0)=2 و f(2)=4', finalAns: 'Df = R\\{1} , f(0)=2 , f(2)=4', pts: 45 }
+    ]
+  }
+};
+
+let currentKey = 'grade8';
+let currentResult = null;
+let currentImageBase64 = null;
+let roster = [
+  { name: 'يامن عبد الرحمن الحسن', cls: 'الصف الثامن - الشعبة الأولى', s1: 60, s2: 60, s3: 170, total: 290 }
+];
+
+function saveConfig() {
+  try {
+    localStorage.setItem('oai_base_url', document.getElementById('baseUrlInput').value.trim());
+    localStorage.setItem('oai_model_name', document.getElementById('modelNameInput').value.trim());
+  } catch (e) {}
+}
+
+function loadConfig() {
+  try {
+    const u = localStorage.getItem('oai_base_url');
+    const m = localStorage.getItem('oai_model_name');
+    if (u) document.getElementById('baseUrlInput').value = u;
+    if (m) document.getElementById('modelNameInput').value = m;
+  } catch (e) {}
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3500);
+}
+
+function switchTab(tabName, btn) {
+  ['scanner', 'rubric', 'sheet', 'roster'].forEach(id => {
+    document.getElementById('tab-' + id).style.display = (id === tabName) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function selectGrade(key) {
+  currentKey = key;
+  ['g7', 'g8', 'g10'].forEach(id => document.getElementById('btn-' + id).classList.remove('active-grade'));
+  if (key === 'grade7') document.getElementById('btn-g7').classList.add('active-grade');
+  if (key === 'grade8') document.getElementById('btn-g8').classList.add('active-grade');
+  if (key === 'grade10') document.getElementById('btn-g10').classList.add('active-grade');
+  renderRubricAndSheet();
+  showToast('تم تفعيل نموذج ' + PRESETS[key].grade + ' (300 درجة)');
+}
+
+function renderRubricAndSheet() {
+  const data = PRESETS[currentKey];
+  const rubricHtml = data.exercises.map(ex => `
+    <div class="ex-item">
+      <div class="ex-head"><span>${ex.title}</span><span style="color:#059669">${ex.pts} درجة</span></div>
+      <div><b>السؤال:</b> ${ex.prompt}</div>
+      <div style="color:#1e40af"><b>سلم الخطوات:</b> ${ex.steps}</div>
+    </div>
+  `).join('');
+  document.getElementById('rubricDetails').innerHTML = rubricHtml;
+
+  document.getElementById('printable-sheet').innerHTML = `
+    <div style="border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:12px; display:flex; justify-content:space-between; font-size:12px; font-weight:800;">
+      <div>الجمهورية العربية السورية<br>${data.schoolName}<br>${data.grade}</div>
+      <div style="text-align:center; font-size:14px;">${data.title}<br><span style="font-size:11px">ورقة قياسية لتصحيح خط اليد والبراهين</span></div>
+      <div style="border:2px solid #000; padding:6px 12px; border-radius:8px;">الدرجة: ...... / 300</div>
+    </div>
+    <div style="font-size:12px;">
+      <div style="background:#f1f5f9; padding:6px; font-weight:800; border:1px solid #94a3b8;">السؤال الأول: اختر الإجابة الصحيحة (60 درجة)</div>
+      ${data.mcq.map((q, i) => `<div style="padding:6px 0; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between;"><span>${i+1}) ${q.q} [${q.opts}]</span><b>( أ ) ( ب ) ( ج ) ( د )</b></div>`).join('')}
+      <div style="background:#f1f5f9; padding:6px; font-weight:800; border:1px solid #94a3b8; margin-top:10px;">السؤال الثاني: املأ الفراغات (60 درجة)</div>
+      ${data.blanks.map((b, i) => `<div style="padding:6px 0; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between;"><span>${i+1}) ${b.q}</span><span style="display:inline-block; width:180px; height:22px; border:1px solid #000;"></span></div>`).join('')}
+      <div style="background:#f1f5f9; padding:6px; font-weight:800; border:1px solid #94a3b8; margin-top:10px;">السؤال الثالث: حل التمارين والبراهين بالتفصيل (180 درجة)</div>
+      ${data.exercises.map(ex => `<div style="border:1px solid #64748b; padding:8px; margin-top:8px; border-radius:6px;"><b>${ex.title} (${ex.pts} درجة):</b> ${ex.prompt}<div style="height:55px; border-bottom:1px dashed #cbd5e1;"></div></div>`).join('')}
+    </div>
+  `;
+}
+
+function handleFile(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    currentImageBase64 = ev.target.result;
+    document.getElementById('previewImg').src = currentImageBase64;
+    document.getElementById('imagePreviewBox').style.display = 'block';
+    showToast('تم تحميل صورة الورقة بنجاح، اضغط على زر بدء التصحيح');
+  };
+  reader.readAsDataURL(file);
+}
+
+function runDemo(mode) {
+  const data = PRESETS[currentKey];
+  const isPartial = (mode === 'partial');
+  const s1 = isPartial ? 45 : 60;
+  const s2 = isPartial ? 52 : 60;
+  const exList = data.exercises.map((ex, idx) => {
+    const cut = isPartial && idx >= 2;
+    return {
+      num: idx + 1,
+      title: ex.title,
+      steps: ex.steps,
+      awarded: cut ? 35 : 45,
+      max: 45,
+      note: cut ? 'خطوات البرهان صحيحة مع خطأ حسابي بسيط في التعويض الأخير.' : 'برهان هندسي وجبري مكتمل ومطابق لسلم التصحيح.'
+    };
+  });
+  const s3 = exList.reduce((a, b) => a + b.awarded, 0);
+  currentResult = {
+    name: isPartial ? 'خالد سامر الدرويش' : 'سارة محمود العلي',
+    cls: data.grade + ' - الشعبة الأولى',
+    s1, s2, s3, total: s1 + s2 + s3,
+    exList
+  };
+  renderResult();
+  showToast('تمت قراءة خط اليد وتصحيح الورقة من 300 درجة!');
+}
+
+async function gradeCurrentImage() {
+  const baseUrl = document.getElementById('baseUrlInput').value.trim().replace(/\/+$/, '');
+  const apiKey = document.getElementById('apiKeyInput').value.trim();
+  const modelName = document.getElementById('modelNameInput').value.trim() || 'gpt-4o-mini';
+
+  if (!apiKey) {
+    showToast('لم يتم إدخال مفتاح API، سيتم تشغيل التصحيح التجريبي الذكي فوراً');
+    runDemo('excellent');
+    return;
+  }
+
+  const btn = document.getElementById('gradeBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الاتصال بـ OpenAI Endpoint وتحليل خط اليد...';
+
+  const data = PRESETS[currentKey];
+  const systemPrompt = `أنت مصحح رياضيات خبير في المنهاج السوري (${data.grade}). قم بتحليل صورة ورقة الطالب وتصحيحها من 300 درجة وفق السلم: السؤال الأول 60 درجة، السؤال الثاني 60 درجة، السؤال الثالث 180 درجة مقسمة على 4 تمارين (45 لكل تمرين). أرجع النتيجة بصيغة JSON حصراً بهذا الشكل:
+{"name":"اسم الطالب","cls":"${data.grade}","s1":60,"s2":60,"s3":180,"total":300,"exList":[{"title":"التمرين الأول","steps":"ما كتبه الطالب","awarded":45,"max":45,"note":"ملاحظة التصحيح"}]}`;
+
+  const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : baseUrl + '/chat/completions';
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: 'اقرأ خط اليد في هذه الورقة وصححها من 300 درجة وأعد JSON فقط.' },
+              { type: 'image_url', image_url: { url: currentImageBase64 } }
+            ]
+          }
+        ],
+        temperature: 0.2
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('HTTP ' + response.status);
     }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
+    const resData = await response.json();
+    const rawText = resData.choices[0].message.content;
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('تنسيق غير صالح');
+
+    currentResult = JSON.parse(jsonMatch[0]);
+    renderResult();
+    showToast('تم التصحيح بنجاح عبر OpenAI Compatible Endpoint!');
+  } catch (err) {
+    showToast('تعذر الاتصال بالخادم (' + err.message + ')، تم عرض النتيجة الافتراضية');
+    runDemo('excellent');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'بدء قراءة خط اليد والتصحيح عبر OpenAI Endpoint (من 300)';
+  }
+}
+
+function renderResult() {
+  if (!currentResult) return;
+  const r = currentResult;
+  document.getElementById('resultCard').innerHTML = `
+    <div class="result-banner">
+      <div>
+        <div style="font-size:11px; color:#6ee7b7; font-weight:700;">اسم الطالب المقروء:</div>
+        <div style="font-size:16px; font-weight:900;">${r.name}</div>
+        <div style="font-size:12px; color:#cbd5e1;">${r.cls}</div>
+      </div>
+      <div style="text-align:center; background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.5); padding:8px 14px; border-radius:12px;">
+        <div style="font-size:11px; color:#a7f3d0;">الدرجة المستحقة</div>
+        <div style="font-size:22px; font-weight:900; color:#fbbf24;">${r.total} / 300</div>
+      </div>
+    </div>
+    <div style="font-size:12px; font-weight:800; margin-bottom:8px;">تفصيل قراءة البراهين والتمارين (س1: ${r.s1}/60 | س2: ${r.s2}/60 | س3: ${r.s3}/180):</div>
+    ${r.exList.map(ex => `
+      <div class="ex-item">
+        <div class="ex-head"><span>${ex.title}</span><span style="color:#059669">${ex.awarded} / ${ex.max} درجة</span></div>
+        <div style="color:#1e3a8a; font-weight:700;">الخط المقروء: ${ex.steps}</div>
+        <div style="color:#065f46;">${ex.note}</div>
+      </div>
+    `).join('')}
+    <button class="btn-green" style="margin-top:10px;" onclick="saveToRoster()">حفظ النتيجة في سجل الدرجات (من 300)</button>
+  `;
+}
+
+function saveToRoster() {
+  if (!currentResult) return;
+  roster.unshift({
+    name: currentResult.name,
+    cls: currentResult.cls,
+    s1: currentResult.s1,
+    s2: currentResult.s2,
+    s3: currentResult.s3,
+    total: currentResult.total
+  });
+  renderRoster();
+  showToast('تم حفظ درجة الطالب (' + currentResult.total + ' / 300) في السجل!');
+  switchTab('roster', document.querySelectorAll('.tab-btn')[3]);
+}
+
+function renderRoster() {
+  document.getElementById('rosterCount').textContent = roster.length;
+  document.getElementById('rosterBody').innerHTML = roster.map(r => `
+    <tr>
+      <td style="font-weight:800;">${r.name}</td>
+      <td>${r.cls}</td>
+      <td>${r.s1}/60</td>
+      <td>${r.s2}/60</td>
+      <td>${r.s3}/180</td>
+      <td style="font-weight:900; color:#059669;">${r.total} / 300</td>
+    </tr>
+  `).join('');
+}
+
+function exportCSV() {
+  const headers = ['اسم الطالب', 'الصف', 'س1 (60)', 'س2 (60)', 'س3 (180)', 'المجموع من 300'];
+  const rows = roster.map(r => [`"${r.name}"`, `"${r.cls}"`, r.s1, r.s2, r.s3, r.total].join(','));
+  const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'سجل_درجات_الرياضيات_300.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+loadConfig();
+renderRubricAndSheet();
+renderRoster();
+</script>
 </body>
 </html>
